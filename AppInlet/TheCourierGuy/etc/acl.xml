@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="AppInlet_TheCourierGuy::config" title="AppInlet TheCourierGuy" sortOrder="51">
+                    <resource id="Dacod_ExternalLinkInNewTab::edit" title="Edit" sortOrder="0"/>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

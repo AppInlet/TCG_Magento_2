@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <appinlet_the_courier_guy>
+                <active>1</active>
+                <sallowspecific>0</sallowspecific>
+                <title>The Courier Guy</title>
+                <name>The Courier Guy</name>
+                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
+                <percentagemarkup>0</percentagemarkup>
+                <freeshippingminimum>500000</freeshippingminimum>
+                <typicalweight>1</typicalweight>
+                <typicalheight>30</typicalheight>
+                <typicallength>30</typicallength>
+                <typicalwidth>30</typicalwidth>
+                <length_of_flyer>45</length_of_flyer>
+                <width_of_flyer>30</width_of_flyer>
+                <height_of_flyer>30</height_of_flyer>
+                <length_of_medium_parcel>60</length_of_medium_parcel>
+                <width_of_medium_parcel>45</width_of_medium_parcel>
+                <height_of_medium_parcel>30</height_of_medium_parcel>
+                <length_of_large_parcel>85</length_of_large_parcel>
+                <width_of_large_parcel>50</width_of_large_parcel>
+                <height_large_parcel>40</height_large_parcel>
+                <flat_rate_active>0</flat_rate_active>
+                <flat_rate>100</flat_rate>
+                <post_quote_at_order_placed>0</post_quote_at_order_placed>
+                <model>AppInlet\TheCourierGuy\Model\Carrier\Shipping</model>
+            </appinlet_the_courier_guy>
+        </carriers>
+    </default>
+</config>
