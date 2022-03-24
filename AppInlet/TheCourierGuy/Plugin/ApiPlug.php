@@ -71,7 +71,14 @@ class ApiPlug
 
         $data = $this->prepare_api_data($request, $itemsList, $quote, $reference);
 
-        return $shiplogic->getRates($data);
+        if (count($data['parcels']) > 0) {
+            return $shiplogic->getRates($data);
+        } else {
+            return array(
+                'message' => 'Please add address to list shipping methods.',
+                'rates'   => []
+            );
+        }
     }
 
     function signRequest(RequestInterface $request, string $accessKeyId, string $secretAccessKey): RequestInterface
