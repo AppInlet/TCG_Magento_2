@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/ObjectManager/etc/config.xsd">
+   <type name="AppInlet\TheCourierGuy\Logger\Handler">
+       <arguments>
+           <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+       </arguments>
+   </type>
+   <type name="AppInlet\TheCourierGuy\Logger\Logger">
+       <arguments>
+           <argument name="name" xsi:type="string">AppInlet_TheCourierGuy_Log</argument>
+           <argument name="handlers"  xsi:type="array">
+               <item name="system" xsi:type="object">AppInlet\TheCourierGuy\Logger\Handler</item>
+           </argument>
+       </arguments>
+   </type>
+
+    <type name="Magento\Cms\Model\Wysiwyg\Images\Storage">
+        <arguments>
+            <argument name="dirs" xsi:type="array">
+                <item name="exclude" xsi:type="array">
+                    <item name="private-directory" xsi:type="array">
+                        <item name="regexp" xsi:type="boolean">true</item>
+                        <item name="name" xsi:type="string">pub[/\\]+media[/\\]+appinlet_the_courier_guy[/\\]*$</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Quote\Model\Cart\ShippingMethodConverter">
+        <plugin name="add_places_to_method" type="AppInlet\TheCourierGuy\Plugin\Carrier\Places" disabled="false" sortOrder="30"/>
+        <plugin name="add_shippingclasses_to_method" type="AppInlet\TheCourierGuy\Plugin\Carrier\ShippingClasses" disabled="false" sortOrder="40"/>
+    </type>
+
+    <type name="Magento\Quote\Model\Quote\Address\Rate">
+        <plugin name="add_places_to_method_rate" type="AppInlet\TheCourierGuy\Plugin\Quote\Address\AddPlacesToMethodRate" disabled="false" sortOrder="3"/>
+        <plugin name="add_shippingclasses_to_method_rate" type="AppInlet\TheCourierGuy\Plugin\Quote\Address\AddShippingClassesToMethodRate" disabled="false" sortOrder="4"/>
+    </type>
+
+
+    <preference for="Magento\Sales\Model\Order\Pdf\Shipment"
+                type="AppInlet\TheCourierGuy\Sales\Model\Order\Pdf\Shipment"/>
+
+
+
+    <preference for="AppInlet\TheCourierGuy\Api\PlacesByNameInterface" type="AppInlet\TheCourierGuy\Model\PlacesByName\PlacesByNameCollection"/>
+
+</config>
