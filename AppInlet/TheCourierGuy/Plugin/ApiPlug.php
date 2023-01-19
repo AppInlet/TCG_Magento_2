@@ -14,7 +14,6 @@ use Psr\Http\Message\RequestInterface;
 
 class ApiPlug
 {
-
     public function __construct(Helper $helper, Monolog $logger, Curl $curl, PayloadPrep $payloadPrep)
     {
         $this->curl        = $curl;
@@ -55,16 +54,21 @@ class ApiPlug
             'destperemail'   => $quote->getCustomerEmail(),
         );
 
-
-        // $products = $this->payloadPrep->getContentsPayload($itemsList);
-
         $quoteParams['details']  = array_merge($quoteParams['details'], $toAddress);
         $quoteParams['contents'] = is_array($itemsList) ? $itemsList : array();
 
         return $this->prepareData($quoteParams, $quote);
     }
 
-    public function getQuote($request, $itemsList, $quote, $reference)
+    /**
+     * @param $request
+     * @param $itemsList
+     * @param $quote
+     * @param $reference
+     *
+     * @return array
+     */
+    public function getQuote($request, $itemsList, $quote, $reference): array
     {
         $objectManager = ObjectManager::getInstance();
         $shiplogic     = $objectManager->create('AppInlet\TheCourierGuy\Helper\Shiplogic');
@@ -140,5 +144,4 @@ class ApiPlug
             "delivery_min_date"   => $t2
         );
     }
-
 }

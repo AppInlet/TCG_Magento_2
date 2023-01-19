@@ -4,7 +4,6 @@ namespace AppInlet\TheCourierGuy\Plugin\Carrier;
 
 use Magento\Quote\Api\Data\ShippingMethodExtensionFactory;
 
-
 class ShippingClasses
 {
     /**

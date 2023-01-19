@@ -8,7 +8,6 @@ use Magento\Framework\App\ObjectManager;
 
 class Updatequote extends Action
 {
-
     public function execute()
     {
         $objectManager = ObjectManager::getInstance();

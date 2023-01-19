@@ -20,7 +20,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     ) {
         $setup->startSetup();
 
-        if ( ! $setup->getConnection()->isTableExists('appinlet_theCourierguy_shipping')) {
+        if (! $setup->getConnection()->isTableExists('appinlet_theCourierguy_shipping')) {
             $this->installShipmentTable($setup);
         }
 
@@ -43,9 +43,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     {
         $table = $setup->getConnection()->newTable(
             $setup->getTable('appinlet_theCourierguy_shipping')
-
-        //using quote number as entity id $order->getQuoteId()
-
+            //using quote number as entity id $order->getQuoteId()
         )->addColumn(
             'entity_id',
             Table::TYPE_INTEGER,
@@ -56,7 +54,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'primary'  => true,
             ],
             'Entity Id'
-
         )->addColumn(
             'shipping_quote_id',
             Table::TYPE_TEXT,
@@ -65,7 +62,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'nullable' => true,
             ],
             'Shipping Quote Id'
-
         )->addColumn(
             'shipping_quote_class',
             Table::TYPE_TEXT,
@@ -74,7 +70,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'nullable' => true,
             ],
             'Shipping Class'
-
         )->addColumn(
             'shipping_quote_rate',
             Table::TYPE_FLOAT,
@@ -83,7 +78,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'nullable' => true,
             ],
             'Shipping Quote Rate'
-
         )->addColumn(
             'shipping_postal_code',
             Table::TYPE_TEXT,
@@ -92,7 +86,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'nullable' => true,
             ],
             'Shipping Postal Code'
-
         )->addColumn(
             'tracker_code',
             Table::TYPE_TEXT,
@@ -101,7 +94,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'nullable' => true,
             ],
             'Tracker Code'
-
         )->addColumn(
             'waybill_url',
             Table::TYPE_TEXT,
@@ -110,7 +102,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'nullable' => true,
             ],
             'Waybill URL'
-
         )->addColumn(
             'created_at',
             Table::TYPE_TIMESTAMP,
@@ -120,7 +111,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'default'  => Table::TIMESTAMP_INIT,
             ],
             'Created At'
-
         )->addColumn(
             'updated_at',
             Table::TYPE_TIMESTAMP,
@@ -130,11 +120,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'default'  => Table::TIMESTAMP_INIT_UPDATE,
             ],
             'Updated At'
-
         );
 
         $setup->getConnection()->createTable($table);
     }
-
-
 }

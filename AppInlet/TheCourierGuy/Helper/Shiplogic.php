@@ -14,7 +14,6 @@ use stdClass;
 
 class Shiplogic extends Data
 {
-
     const API_BASE                     = 'https://api.shiplogic.com/';
     const TCG_SHIP_LOGIC_GETRATES_BODY = 'tcg_ship_logic_getrates_body';
     private $access_key_id;
@@ -119,7 +118,7 @@ class Shiplogic extends Data
         } catch (Exception $exception) {
             $optInRates = [];
         }
-        if ( ! empty($optInRates)) {
+        if (!empty($optInRates)) {
             set_transient($hash, $optInRates, 300);
         }
 
@@ -127,13 +126,12 @@ class Shiplogic extends Data
     }
 
     /**
-     * @param array $package
      * @param array $parameters
      *
-     * @return array|mixed
-     * @throws GuzzleException
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getRates(array $parameters)
+    public function getRates(array $parameters): array
     {
         $body = new stdClass();
 
@@ -152,16 +150,13 @@ class Shiplogic extends Data
         }
 
         $body->parcels = $parcels;
-
-
-        //$body->account_id     = $parameters['account_id'];
         $body->declared_value = $parameters['declared_value'];
 
-        if ( ! empty($parameters['opt_in_rates'])) {
+        if (!empty($parameters['opt_in_rates'])) {
             $body->opt_in_rates = $parameters['opt_in_rates'];
         }
 
-        if ( ! empty($parameters['opt_in_time_based_rates'])) {
+        if (!empty($parameters['opt_in_time_based_rates'])) {
             $body->opt_in_time_based_rates = $parameters['opt_in_time_based_rates'];
         }
 
@@ -170,7 +165,7 @@ class Shiplogic extends Data
 
             return json_decode($response, true);
         } catch (Exception $exception) {
-            $rates = [];
+            return [];
         }
     }
 
@@ -214,8 +209,6 @@ class Shiplogic extends Data
         $sender->local_area     = $parameters['local_area'];
         $sender->city           = $parameters['city'];
         $sender->zone           = $parameters['zone'];
-        //$sender->lat        = $parameters['lat'];
-        //$sender->lng        = $parameters['lng'];
         $sender->country = $parameters['country'];
         $sender->code    = $parameters['code'];
 
@@ -237,8 +230,6 @@ class Shiplogic extends Data
         $receiver->zone           = $parameters['zone'];
         $receiver->country        = $parameters['country'];
         $receiver->code           = $parameters['code'];
-        //$receiver->lat       = $parameters['lat'];
-        //$receiver->lng       = $parameters['lng'];
         return $receiver;
     }
 

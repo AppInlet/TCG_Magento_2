@@ -4,7 +4,6 @@ namespace AppInlet\TheCourierGuy\Api;
 
 interface PlacesByNameInterface
 {
-
     /**
      * GET for Post api
      *
@@ -13,6 +12,4 @@ interface PlacesByNameInterface
      * @return string[]
      */
     public function getPlacesByName();
-
-
 }

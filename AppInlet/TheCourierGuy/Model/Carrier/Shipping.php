@@ -54,7 +54,6 @@ class Shipping extends AbstractCarrier implements
         LoggerInterface $logger,
         ResultFactory $rateResultFactory,
         MethodFactory $rateMethodFactory,
-        array $data = [],
         Helper $helper,
         Monolog $monolog,
         ApiPlug $apiPlug,
@@ -62,7 +61,8 @@ class Shipping extends AbstractCarrier implements
         Session $checkoutSession,
         ShipmentFactory $shipmentFactory,
         QuoteFactory $quoteFactory,
-        Quote $quoteModel
+        Quote $quoteModel,
+        array $data = []
     ) {
         $this->shipmentFactory = $shipmentFactory;
 
@@ -103,7 +103,7 @@ class Shipping extends AbstractCarrier implements
      */
     public function collectRates(RateRequest $request)
     {
-        if ( ! $this->helper->getConfig('active')) {
+        if (!$this->helper->getConfig('active')) {
             $this->monolog->info("TheCourierGuy plugin is not active");
 
             return false;
@@ -147,12 +147,15 @@ class Shipping extends AbstractCarrier implements
 
         $shippingClasses = $this->apiPlug->getQuote($requestDestinationDetails, $productData, $quote, $quoteId);
 
-        if ( ! isset($shippingClasses['rates'][0])) {
+        if (!isset($shippingClasses['rates'][0])) {
             $error = $shippingClasses['message'];
             $this->monolog->info($error);
             throw new LocalizedException(__($error));
         } else {
-            $shippingPrice = $shippingClasses['rates'][0]['rate'];
+            foreach ($shippingClasses['rates'] as $rate) {
+                $method = $this->setShippingMethod($shippingPrice, $rate, $shippingClasses);
+                $result->append($method);
+            }
 
             /** make free if grand total is >= minimum free shipping amount */
             $rate              = (int)($shippingClasses['rates'][0]['rate']);
@@ -165,11 +168,7 @@ class Shipping extends AbstractCarrier implements
             } else {
                 $shippingPrice = $rate + (($percentage_markup / 100) * $rate);
             }
-
-            $method = $this->setShippingMethod($shippingPrice, $shippingClasses);
         }
-
-        $result->append($method);
 
         return $result;
     }
@@ -199,7 +198,7 @@ class Shipping extends AbstractCarrier implements
         );
     }
 
-    protected function setShippingMethod($shippingPrice, $shippingClasses)
+    protected function setShippingMethod($shippingPrice, $rate, $shippingClasses)
     {
         $method = $this->rateMethodFactory->create();
 
@@ -208,15 +207,13 @@ class Shipping extends AbstractCarrier implements
         $method->setCarrier($this->code);
         $method->setCarrierTitle($this->helper->getConfig('title'));
 
-        $method->setMethod($this->code);
-        $method->setMethodTitle($this->helper->getConfig('name'));
+        $method->setMethod($rate['service_level']['code']);
+        $method->setMethodTitle($rate['service_level']['name']);
 
-        $method->setPrice($shippingPrice);
+        $method->setPrice($rate['rate']);
 
-        $method->setCost($shippingPrice);
+        $method->setCost($rate['rate']);
 
         return $method;
     }
-
-
 }

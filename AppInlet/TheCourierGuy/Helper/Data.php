@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2020 Dacod . All rights reserved.
  */
@@ -17,7 +18,6 @@ use Magento\Store\Model\ScopeInterface;
 
 class Data extends AbstractHelper
 {
-
     const XML_PATH_CATALOG = 'carriers/';
 
     /**
@@ -63,11 +63,13 @@ class Data extends AbstractHelper
      */
     public function getConfigValue($field, $storeId = null)
     {
-        if ($fieldValue = $this->scopeConfig->getValue(
-            $field,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        )) {
+        if (
+            $fieldValue = $this->scopeConfig->getValue(
+                $field,
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            )
+        ) {
             return $fieldValue;
         }
 

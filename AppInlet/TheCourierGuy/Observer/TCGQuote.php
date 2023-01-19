@@ -10,7 +10,6 @@ use Magento\Quote\Model\QuoteFactory;
 
 class TCGQuote
 {
-
     public function __construct(
         ShipmentFactory $shipmentFactory,
         ApiPlug $apiPlug,
@@ -25,17 +24,22 @@ class TCGQuote
         $this->monolog         = $monolog;
     }
 
-    public function prepareQuote($order)
+    /**
+     * @param $order
+     *
+     * @return array
+     */
+    public function prepareQuote($order): array
     {
         $quoteId = $order->getQuoteId();
-
         $orderIncrementId = $order->getIncrementId();
-
         $quote = $this->quoteFactory->create()->load($quoteId);
+        $result = [];
 
         $shippingMethod = $order->getShippingMethod();
+        $this->monolog->info('In prepareQuote: Shipping method: ' . $shippingMethod);
 
-        if ($shippingMethod == "appinlet_the_courier_guy_appinlet_the_courier_guy") {
+        if (strpos($shippingMethod, 'appinlet_the_courier_guy_') === 0) {
             //start of loop through items to create array version of items
             $productData = [];
 
@@ -80,14 +84,16 @@ class TCGQuote
                 "city"        => $order->getShippingAddress()->getData("city"),
                 "postal_code" => $order->getShippingAddress()->getData("postcode")
             ];
+
+            $result = [
+                'requestDestinationDetails' => $requestDestinationDetails,
+                'productData'               => $productData,
+                'quote'                     => $quote,
+                'orderIncrementId'          => $orderIncrementId,
+            ];
         }
 
-        return array(
-            'requestDestinationDetails' => $requestDestinationDetails,
-            'productData'               => $productData,
-            'quote'                     => $quote,
-            'orderIncrementId'          => $orderIncrementId,
-        );
+        return $result;
     }
 
     public function createQuote($order)

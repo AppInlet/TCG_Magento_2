@@ -21,10 +21,8 @@ use Magento\Sales\Model\Order\Email\Sender\ShipmentSender;
 use ShipLogicApiException;
 use stdClass;
 
-
 class OrderShipped implements ObserverInterface
 {
-
     private $shiplogic;
 
     public function __construct(
@@ -62,64 +60,63 @@ class OrderShipped implements ObserverInterface
         $quoteId = $order->getQuoteId();
 
         $shippingMethod = $order->getShippingMethod();
+        if (strpos($shippingMethod, 'appinlet_the_courier_guy_') !== 0) {
+            // Is not a TCG method
+            return;
+        }
 
-        $tcgShipment = $this->shipmentFactory->create();
+        $shippingMethodCode = explode('appinlet_the_courier_guy_', $shippingMethod)[1] ?? null;
 
-        $shipmentQuote = $tcgShipment->load($quoteId);
+        $quote_data = $this->tcgQuote->prepareQuote($order);
+
+        $requestDestinationDetails = $quote_data['requestDestinationDetails'];
+        $productData               = $quote_data['productData'];
+        $quote                     = $quote_data['quote'];
+        $orderIncrementId          = $quote_data['orderIncrementId'];
+
+        $shiplogicapi = $this->shiplogic;
 
 
-        if (count($shipmentQuote->getData()) == 0) {
-            $shippingRates = $this->tcgQuote->createQuote($order);
-            if (empty($shippingRates['rates'])) {
-                return false;
+        $body                       = $this->apiPlug->prepare_api_data(
+            $requestDestinationDetails,
+            $productData,
+            $quote,
+            $orderIncrementId
+        );
+        $body['service_level_code'] = $shippingMethodCode;
+
+        $request_body = $this->createShipmentBody($order, $body);
+
+        $response = $shiplogicapi->createShipment($request_body);
+        $response = json_decode($response);
+
+        $shipmentId        = $response->id;
+        $trackingReference = $response->short_tracking_reference;
+        $order->addCommentToStatusHistory("TCG Shipment ID: $shipmentId");
+        $order->addCommentToStatusHistory("TCG Tracking Reference: $trackingReference");
+
+        $media = $this->filesystem->getDirectoryWrite($this->directoryList::MEDIA);
+
+        $fileName = "appinlet_the_courier_guy/" . $quoteId . ".pdf";
+
+        $media->writeFile($fileName, base64_decode($shipmentId));
+
+        $this->addCustomTrack($shipment->getId(), $trackingReference);
+        $waybillUrl = $this->getWaybillLink($shiplogicapi, $shipmentId);
+        $order->addCommentToStatusHistory("<a href='$waybillUrl' download >Link to waybill</a>");
+
+        try {
+            if (!$shipment->getEmailSent()) {
+                $this->shipmentSender->send($shipment);
+                $shipment->setEmailSent(true);
             }
-
-            $quote_data = $this->tcgQuote->prepareQuote($order);
-
-            $requestDestinationDetails = $quote_data['requestDestinationDetails'];
-            $productData               = $quote_data['productData'];
-            $quote                     = $quote_data['quote'];
-            $orderIncrementId          = $quote_data['orderIncrementId'];
-
-            $shiplogicapi = $this->shiplogic;
-
-
-            $body = $this->apiPlug->prepare_api_data(
-                $requestDestinationDetails,
-                $productData,
-                $quote,
-                $orderIncrementId
-            );
-
-            $request_body = $this->createShipmentBody($order, $body, $shippingRates);
-
-            $response = $shiplogicapi->createShipment($request_body);
-            $response = json_decode($response);
-
-            $shipmentQuoteId = $response->id;
-
-            $media = $this->filesystem->getDirectoryWrite($this->directoryList::MEDIA);
-
-            $fileName = "appinlet_the_courier_guy/" . $quoteId . ".pdf";
-
-            $media->writeFile($fileName, base64_decode($shipmentQuoteId));
-
-            $this->addCustomTrack($shipment->getId(), "TCG-" . $shipmentQuoteId);
-
-
-            try {
-                if ( ! $shipment->getEmailSent()) {
-                    $this->shipmentSender->send($shipment);
-                    $shipment->setEmailSent(true);
-                }
-            } catch (Exception $e) {
-                $this->monolog->error($e->getMessage());
-            }
+        } catch (Exception $e) {
+            $this->monolog->error($e->getMessage());
         }
     }
 
 
-    public function createShipmentBody($order, $body, $shippingRates)
+    public function createShipmentBody($order, $body)
     {
         $shippingAddress = $order->getShippingAddress();
 
@@ -150,11 +147,23 @@ class OrderShipped implements ObserverInterface
         $createShipmentBody->special_instructions_collection = '';
         $createShipmentBody->special_instructions_delivery   = '';
         $createShipmentBody->declared_value                  = $body['declared_value'];
-        $createShipmentBody->service_level_id                = $shippingRates['rates'][0]['service_level']['id'];
+        $createShipmentBody->service_level_code              = $body['service_level_code'];
 
         return $createShipmentBody;
     }
 
+    private function getWaybillLink($shiplogicApi, $shipmentId)
+    {
+        $url = '';
+        try {
+            $url = $shiplogicApi->getShipmentLabel($shipmentId);
+            $url = json_decode($url)->url;
+        } catch (\Exception $exception) {
+            $url = $exception->getMessage();
+        }
+
+        return $url;
+    }
 
     public function addCustomTrack($shipmentId, $waybillNumber)
     {

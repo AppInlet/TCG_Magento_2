@@ -46,14 +46,20 @@
                     <validate>required-entry validate-no-empty</validate>
                 </field>
 
-
-                <field id="password" translate="label comment" type="password" sortOrder="700" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Password</label>
-                    <comment>The password supplied by The Courier Guy for integration purposes.</comment>
+                <field id="shiplogic_access_key_id" translate="label comment" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Shiplogic Access Key Id</label>
+                    <comment>Shiplogic Access Key Id</comment>
                     <depends>
                         <field id="active">1</field>
                     </depends>
-                    <validate>required-entry validate-no-empty</validate>
+                </field>
+
+                <field id="shiplogic_secret_access_key" translate="label comment" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Shiplogic Secret Access Key</label>
+                    <comment>Shiplogic Secret Access Key</comment>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
                 </field>
 
                 <field id="sallowspecific" translate="label" type="select" sortOrder="800" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
@@ -91,23 +97,6 @@
                     </depends>
                     <validate>required-entry validate-no-empty</validate>
                 </field>
-
-                <field id="shiplogic_access_key_id" translate="label comment" type="text" sortOrder="1400" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Shiplogic Access Key Id</label>
-                    <comment>Shiplogic Access Key Id</comment>
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
-                </field>
-
-                <field id="shiplogic_secret_access_key" translate="label comment" type="text" sortOrder="1400" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Shiplogic Secret Access Key</label>
-                    <comment>Shiplogic Secret Access Key</comment>
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
-                </field>
-
 
                 <field id="shop_address_1" translate="label comment" type="text" sortOrder="1200" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Shop Address 1</label>
@@ -360,8 +349,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="post_quote_at_order_placed" translate="label comment" type="select" sortOrder="3800" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Only post quote to TCG on order placed</label>
+                <field id="create_shipment_at_order_paid" translate="label comment" type="select" sortOrder="3800" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Create TCG shipment on order paid</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 
@@ -369,14 +358,6 @@
                     <label>Disable Boxes and Depot</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Disable Boxes and Depot Options?</comment>
-                </field>
-
-                <field id="token_key_data" translate="label comment" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>TCG Token</label>
-                    <comment>Reusing token </comment>
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
                 </field>
             </group>
         </section>

@@ -8,8 +8,6 @@ use Magento\Store\Model\ScopeInterface;
 
 class PayloadPrep
 {
-
-
     public function __construct(Helper $helper, ScopeConfigInterface $scopeConfig)
     {
         $this->helper      = $helper;
@@ -105,7 +103,7 @@ class PayloadPrep
                 if ($product_height_per_parcel === '') {
                     $skip = true;
                 }
-                if ( ! $skip) {
+                if (! $skip) {
                     $globalParcel[0] = (int)$product_length_per_parcel;
                     $globalParcel[1] = (int)$product_width_per_parcel;
                     $globalParcel[2] = (int)$product_height_per_parcel;
@@ -140,7 +138,7 @@ class PayloadPrep
         foreach ($items as $item) {
             $item_key = isset($item['key']) ? $item['key'] : 0;
             $fits     = $this->doesFitGlobalParcels($item, $globalParcels);
-            if ( ! $fits['fits']) {
+            if (! $fits['fits']) {
                 $tooBigItems[] = $item_key;
             } else {
                 $fittingItems[] = ['key' => $item_key, 'index' => $fits['fitsIndex']];
@@ -258,7 +256,7 @@ class PayloadPrep
                 $maxItems        = 0;
                 $initialBoxIndex = $fittingItem['index'];
                 $bestFit         = false;
-                while ( ! $bestFit) {
+                while (! $bestFit) {
                     $maxItems = $this->getMaxPackingConfiguration($globalParcels[$initialBoxIndex], $pdims);
 
                     $nboxes = (int)ceil($item['quantity'] / $maxItems);
@@ -308,7 +306,7 @@ class PayloadPrep
             $bestFit = false;
             $k       = $j;
 
-            while ( ! $bestFit) {
+            while (! $bestFit) {
                 $itemIndex    = 0;
                 $anyItemsLeft = true;
                 $nboxes       = 1;
@@ -331,7 +329,7 @@ class PayloadPrep
                         $boxRemaining         = $globalParcels[$initialBoxIndex];
                     }
                     /** Items format differs when multi-vendor plugin is enabled */
-                    if ( ! isset($item)) {
+                    if (! isset($item)) {
                         if (isset($items[$fittingItems[$itemIndex]['key']])) {
                             $item = $items[$fittingItems[$itemIndex]['key']];
                         } else {
@@ -521,7 +519,7 @@ class PayloadPrep
                             break;
                         }
                     }
-                    if ( ! $match && $k === 1) {
+                    if (! $match && $k === 1) {
                         $k--;
                     }
                 }
@@ -559,21 +557,21 @@ class PayloadPrep
                                         ) {
                                             $match             = true;
                                             $newCount          = intval($pool[$p]) + intval(
-                                                    $dimensions[$i]['count']
-                                                ) + intval(
-                                                                     $dimensions[$j]['count']
-                                                                 );
+                                                $dimensions[$i]['count']
+                                            ) + intval(
+                                                $dimensions[$j]['count']
+                                            );
                                             $newMass           = intval($pool[$p]['mass']) * intval(
-                                                    $pool[$p]['count']
-                                                ) + intval(
-                                                        $dimensions[$i]['count']
-                                                    ) * intval(
-                                                        $dimensions[$i]['mass']
-                                                    ) + intval(
-                                                            $dimensions[$i]['count']
-                                                        ) * intval(
-                                                            $dimensions[$i]['mass']
-                                                        );
+                                                $pool[$p]['count']
+                                            ) + intval(
+                                                $dimensions[$i]['count']
+                                            ) * intval(
+                                                $dimensions[$i]['mass']
+                                            ) + intval(
+                                                $dimensions[$i]['count']
+                                            ) * intval(
+                                                $dimensions[$i]['mass']
+                                            );
                                             $newMass           /= $newCount;
                                             $pool[$p]['count'] = $newCount;
                                             $pool[$p]['mass']  = $newMass;
@@ -588,7 +586,7 @@ class PayloadPrep
                     }
                 }
             }
-            if ( ! $match && count($dimensions) > 0) {
+            if (! $match && count($dimensions) > 0) {
                 foreach ($dimensions as $dimension) {
                     $pooledItems[] = $dimension;
                 }
@@ -644,7 +642,7 @@ class PayloadPrep
         }
 
         foreach ($fittingItems as $k => $fittingItem) {
-            if ( ! in_array($fittingItem['key'], $pooledKeys)) {
+            if (! in_array($fittingItem['key'], $pooledKeys)) {
                 unset($fittingItems[$k]);
             }
         }
