@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright © Magento, Inc. All rights reserved.
+ * Copyright © 2024 App Inlet (Pty) Ltd. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -45,6 +45,10 @@ class Shipment extends AbstractPdf
      * @var ResolverInterface
      */
     protected $_localeResolver;
+    private ApiPlug $apiPlug;
+    private Filesystem $fileSystem;
+    private ShipmentFactory $shipmentFactory;
+    private DirectoryList $directoryList;
 
     /**
      * @param Data $paymentData
@@ -76,10 +80,10 @@ class Shipment extends AbstractPdf
         Renderer $addressRenderer,
         StoreManagerInterface $storeManager,
         ResolverInterface $localeResolver,
-        array $data = [],
         DirectoryList $directoryList,
         ShipmentFactory $shipmentFactory,
-        ApiPlug $apiPlug
+        ApiPlug $apiPlug,
+        array $data = []
     ) {
         $this->apiPlug         = $apiPlug;
         $this->fileSystem      = $filesystem;

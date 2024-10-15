@@ -46,6 +46,13 @@ class Shipping extends AbstractCarrier implements
     protected $quoteFactory;
 
     protected $quoteModel;
+    protected ShipmentFactory $shipmentFactory;
+    protected Monolog $monolog;
+    protected ApiPlug $apiPlug;
+    protected Helper $helper;
+    protected Session $checkoutSession;
+    protected LoggerInterface $logger;
+    protected Cart $cart;
 
 
     public function __construct(
@@ -150,11 +157,24 @@ class Shipping extends AbstractCarrier implements
         if (!isset($shippingClasses['rates'][0])) {
             $error = $shippingClasses['message'];
             $this->monolog->info($error);
-            throw new LocalizedException(__($error));
+            return $result;
         } else {
             foreach ($shippingClasses['rates'] as $rate) {
                 $method = $this->setShippingMethod($shippingPrice, $rate, $shippingClasses);
                 $result->append($method);
+            }
+
+            $allRates = $result->getAllRates();
+
+            $excludedRates = explode(",", $this->helper->getConfig('excluderates'));
+
+            for ($i = 0; $i < sizeof($excludedRates); $i++) {
+                for ($j = 0; $j < sizeof($allRates); $j++) {
+                    $rate = $allRates[$j];
+                    if ($rate->getData("method") === $excludedRates[$i]) {
+                        $rate->unsetData();
+                    }
+                }
             }
 
             /** make free if grand total is >= minimum free shipping amount */
@@ -163,6 +183,10 @@ class Shipping extends AbstractCarrier implements
 
             if ($grandTotal >= $freeshippingminimum) {
                 $shippingPrice = 0;
+                foreach ($allRates as $rate) {
+                    $rate->setPrice($shippingPrice);
+                    $rate->setData("method_title", "**FREE SHIPPING** " . $rate->getData("method_title"));
+                }
             } elseif ($this->helper->getConfig('flat_rate_active')) {
                 $shippingPrice = $this->helper->getConfig('flat_rate');
             } else {

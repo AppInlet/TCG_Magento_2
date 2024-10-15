@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright © 2020 Dacod. All rights reserved.
+ * Copyright © 2024 App Inlet (Pty) Ltd. All rights reserved.
  * See COPYING.txt for license details.
  */
 -->
@@ -46,17 +46,9 @@
                     <validate>required-entry validate-no-empty</validate>
                 </field>
 
-                <field id="shiplogic_access_key_id" translate="label comment" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Shiplogic Access Key Id</label>
-                    <comment>Shiplogic Access Key Id</comment>
-                    <depends>
-                        <field id="active">1</field>
-                    </depends>
-                </field>
-
-                <field id="shiplogic_secret_access_key" translate="label comment" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Shiplogic Secret Access Key</label>
-                    <comment>Shiplogic Secret Access Key</comment>
+                <field id="shiplogic_api_key" translate="label comment" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Key</label>
+                    <comment>Shiplogic API Key</comment>
                     <depends>
                         <field id="active">1</field>
                     </depends>
@@ -349,8 +341,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="create_shipment_at_order_paid" translate="label comment" type="select" sortOrder="3800" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Create TCG shipment on order paid</label>
+                <field id="disable_tcg_shipment_at_create_shipment" translate="label comment" type="select" sortOrder="3850" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable TCG shipment on create shipment</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 

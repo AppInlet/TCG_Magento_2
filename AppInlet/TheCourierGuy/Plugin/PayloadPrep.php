@@ -8,6 +8,8 @@ use Magento\Store\Model\ScopeInterface;
 
 class PayloadPrep
 {
+    private Helper $helper;
+    private ScopeConfigInterface $scopeConfig;
     public function __construct(Helper $helper, ScopeConfigInterface $scopeConfig)
     {
         $this->helper      = $helper;

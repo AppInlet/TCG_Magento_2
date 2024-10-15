@@ -3,34 +3,46 @@
 namespace AppInlet\TheCourierGuy\Plugin;
 
 use AppInlet\TheCourierGuy\Helper\Data as Helper;
+use AppInlet\TheCourierGuy\Helper\Shiplogic;
 use AppInlet\TheCourierGuy\Logger\Logger as Monolog;
 use Aws\Credentials\Credentials;
 use Aws\Signature\SignatureV4;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
-use Magento\Framework\App\ObjectManager;
+use GuzzleHttp\Exception\GuzzleException;
 use Magento\Framework\HTTP\Client\Curl;
 use Psr\Http\Message\RequestInterface;
 
 class ApiPlug
 {
-    public function __construct(Helper $helper, Monolog $logger, Curl $curl, PayloadPrep $payloadPrep)
-    {
+    private Curl $curl;
+    private Monolog $logger;
+    private Helper $helper;
+    private PayloadPrep $payloadPrep;
+    private string $email;
+    private string $password;
+    private Shiplogic $shipLogic;
+
+    public function __construct(
+        Helper $helper,
+        Monolog $logger,
+        Curl $curl,
+        PayloadPrep $payloadPrep,
+        Shiplogic $shipLogic
+    ) {
         $this->curl        = $curl;
         $this->logger      = $logger;
         $this->helper      = $helper;
         $this->payloadPrep = $payloadPrep;
         $this->email       = $this->helper->getConfig('account_number');
         $this->password    = $this->helper->getConfig('password');
+        $this->shipLogic = $shipLogic;
     }
 
     public function prepare_api_data($request, $itemsList, $quote, $reference)
     {
         $request['region'] = $quote->getShippingAddress()->getRegion();
 
-        $quoteParams            = array();
-        $quoteParams['details'] = array();
-
+        $quoteParams            = [];
+        $quoteParams['details'] = [];
 
         /** added these just to make sure these tests are not processed as actual waybills */
         $quoteParams['details']['specinstruction'] = "";
@@ -41,7 +53,7 @@ class ApiPlug
         $lastName  = $quote->getShippingAddress()->getLastname();
         $email     = $quote->getBillingAddress()->getCustomerEmail();
 
-        $toAddress = array(
+        $toAddress = [
             'destperadd1'    => $request['street'],
             'destperadd2'    => '',
             'destperadd3'    => $request['city'],
@@ -52,10 +64,10 @@ class ApiPlug
             'destpercontact' => $firstName,
             'destperpcode'   => $request['postal_code'],
             'destperemail'   => $quote->getCustomerEmail(),
-        );
+        ];
 
         $quoteParams['details']  = array_merge($quoteParams['details'], $toAddress);
-        $quoteParams['contents'] = is_array($itemsList) ? $itemsList : array();
+        $quoteParams['contents'] = is_array($itemsList) ? $itemsList : [];
 
         return $this->prepareData($quoteParams, $quote);
     }
@@ -67,25 +79,23 @@ class ApiPlug
      * @param $reference
      *
      * @return array
+     * @throws GuzzleException
      */
     public function getQuote($request, $itemsList, $quote, $reference): array
     {
-        $objectManager = ObjectManager::getInstance();
-        $shiplogic     = $objectManager->create('AppInlet\TheCourierGuy\Helper\Shiplogic');
-
         $data = $this->prepare_api_data($request, $itemsList, $quote, $reference);
 
         if (count($data['parcels']) > 0) {
-            return $shiplogic->getRates($data);
+            return $this->shipLogic->getRates($data);
         } else {
-            return array(
+            return [
                 'message' => 'Please add address to list shipping methods.',
                 'rates'   => []
-            );
+            ];
         }
     }
 
-    function signRequest(RequestInterface $request, string $accessKeyId, string $secretAccessKey): RequestInterface
+    public function signRequest(RequestInterface $request, string $accessKeyId, string $secretAccessKey): RequestInterface
     {
         $signature   = new SignatureV4('execute-api', 'af-south-1');
         $credentials = new Credentials($accessKeyId, $secretAccessKey);
@@ -97,10 +107,10 @@ class ApiPlug
     {
         $items      = $quoteParams['contents'];
         $total      = (float)$quote->getGrandTotal();
-        $items_data = array();
+        $items_data = [];
 
         foreach ($items as $item) {
-            $item_data                        = array();
+            $item_data                        = [];
             $item_data['submitted_length_cm'] = (int)$item['length'];
             $item_data['submitted_width_cm']  = (int)$item['width'];
             $item_data['submitted_height_cm'] = (int)$item['height'];
@@ -115,8 +125,8 @@ class ApiPlug
 
         $sender_address = $this->helper->getConfig('shop_address_1') . " " . $this->helper->getConfig('shop_address_2');
 
-        return array(
-            "sender"              => array(
+        return [
+            "sender"              => [
                 "company"        => $this->helper->getConfig('company'),
                 "type"           => "business",
                 "street_address" => $sender_address,
@@ -127,8 +137,8 @@ class ApiPlug
                 "code"           => $this->helper->getConfig('shop_postal_code'),
                 "lat"            => "",
                 "lng"            => ""
-            ),
-            "receiver"            => array(
+            ],
+            "receiver"            => [
                 "company"        => "",
                 "street_address" => $details['destperadd1'] . ' ' . $details['destperadd2'],
                 "type"           => "",
@@ -137,11 +147,11 @@ class ApiPlug
                 "zone"           => $details['destperadd4'],
                 "country"        => "ZA",
                 "code"           => $details['destperpcode']
-            ),
+            ],
             "parcels"             => $items_data,
             "declared_value"      => $total,
             "collection_min_date" => $current_date,
             "delivery_min_date"   => $t2
-        );
+        ];
     }
 }

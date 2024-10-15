@@ -24,7 +24,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->installShipmentTable($setup);
         }
 
-        if (version_compare($context->getVersion(), '1.1.1') < 0) {
+        if (version_compare($context->getVersion(), '1.2.0') < 0) {
             $setup->getConnection()->addColumn(
                 $setup->getTable('quote'),
                 'courierguy_place_id',
