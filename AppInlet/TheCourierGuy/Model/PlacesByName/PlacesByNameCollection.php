@@ -26,7 +26,7 @@ class PlacesByNameCollection implements PlacesByNameInterface
      */
     protected $_storeManager;
 
-    function __construct(
+    public function __construct(
         Request $request,
         ApiPlug $apiPlug,
         StoreManagerInterface $storeManager,

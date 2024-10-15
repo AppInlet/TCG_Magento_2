@@ -1,0 +1,9 @@
+=====================================
+Date	  : Version: Description
+=====================================
+
+2024-10-15: v1.2.0 : Switched TCG account auth to tokenised api key.
+                     Added return order functionality.
+                     Fixed an issue with auto-submit shipment.
+                     Fixed an issue with Amasty Checkout.
+                     Bug fixes and improvements.

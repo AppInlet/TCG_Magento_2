@@ -2,22 +2,19 @@
 
 namespace AppInlet\TheCourierGuy\Helper;
 
-use Aws\Credentials\Credentials;
-use Aws\Signature\SignatureV4;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
-use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Cache\Frontend\Pool;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Helper\Context;
-use Psr\Http\Message\RequestInterface;
 use stdClass;
+use AppInlet\TheCourierGuy\Model\Carrier\ShipmentProcessor;
 
 class Shiplogic extends Data
 {
-    const API_BASE                     = 'https://api.shiplogic.com/';
-    const TCG_SHIP_LOGIC_GETRATES_BODY = 'tcg_ship_logic_getrates_body';
-    private $access_key_id;
-    private $secret_access_key;
+    public const API_BASE                     = 'https://api.shiplogic.com/v2/';
     private $sender;
     private $receiver;
     private $apiMethods = [
@@ -56,16 +53,19 @@ class Shiplogic extends Data
      */
     public function makeAPIRequest(string $apiMethod, array $data): string
     {
+        $credentials     = $this->getShipLogicCredentials();
+        $apiKey = $credentials['shiplogic_api_key'];
+
         $client  = new Client();
         $amzDate = date('Ymd\THis\Z');
         $headers = [
             'X-Amz-Date'   => $amzDate,
             'Cookie'       => 'XDEBUG_SESSION=PHPSTORM',
             'Content-Type' => 'application/json',
+            'Authorization' => "Bearer $apiKey",
         ];
         $method  = $this->apiMethods[$apiMethod]['method'];
         $uri     = $this->apiMethods[$apiMethod]['endPoint'];
-
 
         if ($method === 'POST') {
             $request = new Request(
@@ -83,9 +83,7 @@ class Shiplogic extends Data
             );
         }
 
-        $signedRequest = $this->signRequest($request);
-
-        $response = $client->send($signedRequest);
+        $response = $client->send($request);
 
         return $response->getBody()->getContents();
     }
@@ -99,8 +97,8 @@ class Shiplogic extends Data
      */
     public function getOptInRates(array $package, array $parameters): array
     {
-        $this->sender             = $this->getSender($parameters);
-        $this->receiver           = $this->getReceiver($package);
+        $this->sender             = $this->getAddressDetail($parameters);
+        $this->receiver           = $this->getAddressDetail($package);
         $body                     = new stdClass();
         $body->collection_address = $this->sender;
         $body->delivery_address   = $this->receiver;
@@ -135,8 +133,8 @@ class Shiplogic extends Data
     {
         $body = new stdClass();
 
-        $body->collection_address = $this->getSender($parameters['sender']);
-        $body->delivery_address   = $this->getReceiver($parameters['receiver']);
+        $body->collection_address = $this->getAddressDetail($parameters['sender']);
+        $body->delivery_address   = $this->getAddressDetail($parameters['receiver']);
         $parcels                  = [];
         $parcelsArray             = $parameters['parcels'];
 
@@ -164,7 +162,7 @@ class Shiplogic extends Data
             $response = $this->makeAPIRequest('getRates', ['body' => json_encode($body)]);
 
             return json_decode($response, true);
-        } catch (Exception $exception) {
+        } catch (Exception $ex) {
             return [];
         }
     }
@@ -188,59 +186,32 @@ class Shiplogic extends Data
         return $this->makeAPIRequest('getShipmentLabel', ['param' => $id]);
     }
 
-    protected function getShipLogicCredentials()
+    /**
+     * @return array
+     */
+    protected function getShipLogicCredentials(): array
     {
-        return array(
-            "access_key_id"     => $this->getConfig('shiplogic_access_key_id'),
-            "secret_access_key" => $this->getConfig('shiplogic_secret_access_key')
-        );
+        return [
+            'shiplogic_api_key' => $this->getConfig('shiplogic_api_key'),
+        ];
     }
 
     /**
-     * @param array $parameters
+     * @param $parameters
      *
-     * @return object
+     * @return stdClass
      */
-    private function getSender($parameters)
+    public function getAddressDetail($parameters): stdClass
     {
-        $sender                 = new stdClass();
-        $sender->company        = $parameters['company'];
-        $sender->street_address = $parameters['street_address'];
-        $sender->local_area     = $parameters['local_area'];
-        $sender->city           = $parameters['city'];
-        $sender->zone           = $parameters['zone'];
-        $sender->country = $parameters['country'];
-        $sender->code    = $parameters['code'];
+        $addressDetail                 = new stdClass();
+        $addressDetail->company        = $parameters['company'];
+        $addressDetail->street_address = $parameters['street_address'];
+        $addressDetail->local_area     = $parameters['local_area'];
+        $addressDetail->city           = $parameters['city'];
+        $addressDetail->zone           = $parameters['zone'];
+        $addressDetail->country        = $parameters['country'];
+        $addressDetail->code           = $parameters['code'];
 
-        return $sender;
-    }
-
-    /**
-     * @param array $package
-     *
-     * @return object
-     */
-    private function getReceiver($parameters)
-    {
-        $receiver                 = new stdClass();
-        $receiver->company        = $parameters['company'];
-        $receiver->street_address = $parameters['street_address'];
-        $receiver->local_area     = $parameters['local_area'];
-        $receiver->city           = $parameters['city'];
-        $receiver->zone           = $parameters['zone'];
-        $receiver->country        = $parameters['country'];
-        $receiver->code           = $parameters['code'];
-        return $receiver;
-    }
-
-    private function signRequest(RequestInterface $request): RequestInterface
-    {
-        $credentials     = $this->getShipLogicCredentials();
-        $accessKeyId     = $credentials['access_key_id'];
-        $secretAccessKey = $credentials['secret_access_key'];
-        $signature       = new SignatureV4('execute-api', 'af-south-1');
-        $credentials     = new Credentials($accessKeyId, $secretAccessKey);
-
-        return $signature->signRequest($request, $credentials);
+        return $addressDetail;
     }
 }

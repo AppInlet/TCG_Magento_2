@@ -10,6 +10,13 @@ use Magento\Quote\Model\QuoteFactory;
 
 class TCGQuote
 {
+
+    private ApiPlug $apiPlug;
+    private Monolog $monolog;
+    private Helper $helper;
+    private QuoteFactory $quoteFactory;
+    private ShipmentFactory $shipmentFactory;
+
     public function __construct(
         ShipmentFactory $shipmentFactory,
         ApiPlug $apiPlug,

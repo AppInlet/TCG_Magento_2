@@ -38,6 +38,10 @@
         <plugin name="add_shippingclasses_to_method_rate" type="AppInlet\TheCourierGuy\Plugin\Quote\Address\AddShippingClassesToMethodRate" disabled="false" sortOrder="4"/>
     </type>
 
+    <type name="\Magento\Sales\Block\Adminhtml\Order\View">
+        <plugin name="return_shipment_order" type="AppInlet\TheCourierGuy\Plugin\TCGBtnReturnShipmentOrderView" />
+    </type>
+
 
     <preference for="Magento\Sales\Model\Order\Pdf\Shipment"
                 type="AppInlet\TheCourierGuy\Sales\Model\Order\Pdf\Shipment"/>

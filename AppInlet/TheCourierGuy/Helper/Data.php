@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright © 2020 Dacod . All rights reserved.
+ * Copyright © 2024 App Inlet (Pty) Ltd . All rights reserved.
  */
 
 namespace AppInlet\TheCourierGuy\Helper;
@@ -18,7 +18,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class Data extends AbstractHelper
 {
-    const XML_PATH_CATALOG = 'carriers/';
+    public const XML_PATH_CATALOG = 'carriers/';
 
     /**
      * @var WriterInterface
