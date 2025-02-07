@@ -21,9 +21,9 @@ class OrderShipped implements ObserverInterface
         ShipmentProcessor $shipmentProcessor,
         ManagerInterface $messageManager
     ) {
-        $this->helper             = $helper;
-        $this->shipmentProcessor  = $shipmentProcessor;
-        $this->messageManager     = $messageManager;
+        $this->helper            = $helper;
+        $this->shipmentProcessor = $shipmentProcessor;
+        $this->messageManager    = $messageManager;
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright © 2024 App Inlet (Pty) Ltd. All rights reserved.
+ * Copyright © 2025 App Inlet (Pty) Ltd. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -156,7 +156,7 @@ class Shipment extends AbstractPdf
 
                     //if waybill has not been saved. get base64 encoded waybill via API and save it
 
-                    if (! file_exists($fileName)) {
+                    if (!file_exists($fileName)) {
                         $waybillArray = $this->apiPlug->getWaybill($shipmentQuote->getData('shipping_quote_id'));
 
                         $media = $this->fileSystem->getDirectoryWrite($this->directoryList::MEDIA);
@@ -231,7 +231,7 @@ class Shipment extends AbstractPdf
         $page                     = $this->_getPdf()->newPage(Zend_Pdf_Page::SIZE_A4);
         $this->_getPdf()->pages[] = $page;
         $this->y                  = 800;
-        if (! empty($settings['table_header'])) {
+        if (!empty($settings['table_header'])) {
             $this->_drawHeader($page);
         }
 

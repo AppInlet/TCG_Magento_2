@@ -84,20 +84,21 @@ class ShipmentProcessor
         ShipmentSender $shipmentSender
     ) {
         $this->shipmentRepository = $shipmentRepository;
-        $this->trackFactory = $trackFactory;
-        $this->monolog = $monolog;
-        $this->helper = $helper;
-        $this->tcgQuote = $tcgQuote;
-        $this->apiPlug = $apiPlug;
-        $this->shipLogic = $shipLogic;
-        $this->filesystem = $filesystem;
-        $this->directoryList = $directoryList;
-        $this->shipmentSender = $shipmentSender;
+        $this->trackFactory       = $trackFactory;
+        $this->monolog            = $monolog;
+        $this->helper             = $helper;
+        $this->tcgQuote           = $tcgQuote;
+        $this->apiPlug            = $apiPlug;
+        $this->shipLogic          = $shipLogic;
+        $this->filesystem         = $filesystem;
+        $this->directoryList      = $directoryList;
+        $this->shipmentSender     = $shipmentSender;
     }
 
     /**
      * @param $shiplogicApi
      * @param $shipmentId
+     *
      * @return string
      */
     public function getWaybillLink($shiplogicApi, $shipmentId)
@@ -116,6 +117,7 @@ class ShipmentProcessor
     /**
      * @param $shipmentId
      * @param $waybillNumber
+     *
      * @return void
      */
     public function addCustomTrack($shipmentId, $waybillNumber): void
@@ -144,6 +146,7 @@ class ShipmentProcessor
      * @param $order
      * @param $body
      * @param bool $returnShipment
+     *
      * @return stdClass
      */
     public function createShipmentBody($order, $body, bool $returnShipment = false): stdClass
@@ -155,20 +158,20 @@ class ShipmentProcessor
 
         $createShipmentBody = new stdClass();
 
-        $collection_address                     = $this->shipLogic->getAddressDetail($body['sender']);
-        $collection_contact                     = new stdClass();
-        $collection_contact->name               = $body['sender']['company'];
-        $collection_contact->mobile_number      = $telephone;
-        $collection_contact->email              = $email;
+        $collection_address                = $this->shipLogic->getAddressDetail($body['sender']);
+        $collection_contact                = new stdClass();
+        $collection_contact->name          = $body['sender']['company'];
+        $collection_contact->mobile_number = $telephone;
+        $collection_contact->email         = $email;
 
         $createShipmentBody->collection_contact = $collection_contact;
         $createShipmentBody->collection_address = $collection_address;
 
-        $delivery_address                     = $this->shipLogic->getAddressDetail($body['receiver']);
-        $delivery_contact                     = new stdClass();
-        $delivery_contact->name               = $order->getCustomerName();
-        $delivery_contact->mobile_number      = $shippingAddress->getTelephone();
-        $delivery_contact->email              = $shippingAddress->getEmail();
+        $delivery_address                = $this->shipLogic->getAddressDetail($body['receiver']);
+        $delivery_contact                = new stdClass();
+        $delivery_contact->name          = $order->getCustomerName();
+        $delivery_contact->mobile_number = $shippingAddress->getTelephone();
+        $delivery_contact->email         = $shippingAddress->getEmail();
 
         $createShipmentBody->delivery_contact = $delivery_contact;
         $createShipmentBody->delivery_address = $delivery_address;
@@ -190,6 +193,7 @@ class ShipmentProcessor
             $createShipmentBody->collection_contact = $delivery_contact;
             $createShipmentBody->collection_address = $delivery_address;
         }
+
         return $createShipmentBody;
     }
 
@@ -203,7 +207,7 @@ class ShipmentProcessor
         $shippingMethodCode = explode('appinlet_the_courier_guy_', $shippingMethod)[1] ?? null;
 
         $quote_data = $this->tcgQuote->prepareQuote($order);
-        $quoteId = $order->getQuoteId();
+        $quoteId    = $order->getQuoteId();
 
         $requestDestinationDetails = $quote_data['requestDestinationDetails'];
         $productData               = $quote_data['productData'];
@@ -212,7 +216,7 @@ class ShipmentProcessor
 
         $shipLogicApi = $this->shipLogic;
 
-        $body = $this->apiPlug->prepare_api_data(
+        $body                       = $this->apiPlug->prepare_api_data(
             $requestDestinationDetails,
             $productData,
             $quote,
