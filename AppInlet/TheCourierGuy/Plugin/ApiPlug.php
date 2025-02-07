@@ -34,7 +34,7 @@ class ApiPlug
         $this->payloadPrep = $payloadPrep;
         $this->email       = $this->helper->getConfig('account_number');
         $this->password    = $this->helper->getConfig('password');
-        $this->shipLogic = $shipLogic;
+        $this->shipLogic   = $shipLogic;
     }
 
     public function prepare_api_data($request, $itemsList, $quote, $reference)
@@ -95,8 +95,11 @@ class ApiPlug
         }
     }
 
-    public function signRequest(RequestInterface $request, string $accessKeyId, string $secretAccessKey): RequestInterface
-    {
+    public function signRequest(
+        RequestInterface $request,
+        string $accessKeyId,
+        string $secretAccessKey
+    ): RequestInterface {
         $signature   = new SignatureV4('execute-api', 'af-south-1');
         $credentials = new Credentials($accessKeyId, $secretAccessKey);
 

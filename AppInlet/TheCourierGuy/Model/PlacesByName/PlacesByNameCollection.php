@@ -49,7 +49,7 @@ class PlacesByNameCollection implements PlacesByNameInterface
     {
         $payload = json_decode($this->request->getContent(), true);
 
-        if (! isset($payload['place_name'])) {
+        if (!isset($payload['place_name'])) {
             throw new LocalizedException(__('place name must be specified.'));
 
             return json_encode(['error' => "place name must be specified."]);

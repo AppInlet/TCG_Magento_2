@@ -38,10 +38,10 @@ class TCGQuote
      */
     public function prepareQuote($order): array
     {
-        $quoteId = $order->getQuoteId();
+        $quoteId          = $order->getQuoteId();
         $orderIncrementId = $order->getIncrementId();
-        $quote = $this->quoteFactory->create()->load($quoteId);
-        $result = [];
+        $quote            = $this->quoteFactory->create()->load($quoteId);
+        $result           = [];
 
         $shippingMethod = $order->getShippingMethod();
         $this->monolog->info('In prepareQuote: Shipping method: ' . $shippingMethod);
@@ -53,6 +53,11 @@ class TCGQuote
             $packageItemId = 0;
 
             foreach ($order->getAllItems() as $key => $item) {
+                // Skip virtual products
+                if ($item->getIsVirtual()) {
+                    continue;
+                }
+
                 $lineItem             = [];
                 $lineItem['key']      = $packageItemId;
                 $lineItem['name']     = $item->getName();

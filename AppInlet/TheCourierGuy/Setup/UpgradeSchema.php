@@ -20,7 +20,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     ) {
         $setup->startSetup();
 
-        if (! $setup->getConnection()->isTableExists('appinlet_theCourierguy_shipping')) {
+        if (!$setup->getConnection()->isTableExists('appinlet_theCourierguy_shipping')) {
             $this->installShipmentTable($setup);
         }
 
@@ -29,9 +29,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('quote'),
                 'courierguy_place_id',
                 [
-                    'type'     => 'text',
+                    'type' => 'text',
                     'nullable' => false,
-                    'comment'  => 'Place Id',
+                    'comment' => 'Place Id',
                 ]
             );
         }
@@ -43,7 +43,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     {
         $table = $setup->getConnection()->newTable(
             $setup->getTable('appinlet_theCourierguy_shipping')
-            //using quote number as entity id $order->getQuoteId()
+        //using quote number as entity id $order->getQuoteId()
         )->addColumn(
             'entity_id',
             Table::TYPE_INTEGER,

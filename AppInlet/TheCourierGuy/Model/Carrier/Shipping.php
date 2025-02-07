@@ -157,6 +157,7 @@ class Shipping extends AbstractCarrier implements
         if (!isset($shippingClasses['rates'][0])) {
             $error = $shippingClasses['message'];
             $this->monolog->info($error);
+
             return $result;
         } else {
             foreach ($shippingClasses['rates'] as $rate) {
@@ -181,14 +182,17 @@ class Shipping extends AbstractCarrier implements
             $rate              = (int)($shippingClasses['rates'][0]['rate']);
             $percentage_markup = (int)($this->helper->getConfig('percentagemarkup'));
 
-            if ($grandTotal >= $freeshippingminimum) {
+            if ($this->helper->getConfig('flat_rate_active') == 1 && $grandTotal <= $freeshippingminimum) {
+                $shippingPrice = $this->helper->getConfig('flat_rate');
+                foreach ($allRates as $rate) {
+                    $rate->setPrice($shippingPrice);
+                }
+            } elseif ($grandTotal >= $freeshippingminimum) {
                 $shippingPrice = 0;
                 foreach ($allRates as $rate) {
                     $rate->setPrice($shippingPrice);
                     $rate->setData("method_title", "**FREE SHIPPING** " . $rate->getData("method_title"));
                 }
-            } elseif ($this->helper->getConfig('flat_rate_active')) {
-                $shippingPrice = $this->helper->getConfig('flat_rate');
             } else {
                 $shippingPrice = $rate + (($percentage_markup / 100) * $rate);
             }

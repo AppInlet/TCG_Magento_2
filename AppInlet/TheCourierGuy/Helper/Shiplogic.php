@@ -14,7 +14,7 @@ use AppInlet\TheCourierGuy\Model\Carrier\ShipmentProcessor;
 
 class Shiplogic extends Data
 {
-    public const API_BASE                     = 'https://api.shiplogic.com/v2/';
+    public const API_BASE = 'https://api.shiplogic.com/v2/';
     private $sender;
     private $receiver;
     private $apiMethods = [
@@ -53,15 +53,15 @@ class Shiplogic extends Data
      */
     public function makeAPIRequest(string $apiMethod, array $data): string
     {
-        $credentials     = $this->getShipLogicCredentials();
-        $apiKey = $credentials['shiplogic_api_key'];
+        $credentials = $this->getShipLogicCredentials();
+        $apiKey      = $credentials['shiplogic_api_key'];
 
         $client  = new Client();
         $amzDate = date('Ymd\THis\Z');
         $headers = [
-            'X-Amz-Date'   => $amzDate,
-            'Cookie'       => 'XDEBUG_SESSION=PHPSTORM',
-            'Content-Type' => 'application/json',
+            'X-Amz-Date'    => $amzDate,
+            'Cookie'        => 'XDEBUG_SESSION=PHPSTORM',
+            'Content-Type'  => 'application/json',
             'Authorization' => "Bearer $apiKey",
         ];
         $method  = $this->apiMethods[$apiMethod]['method'];
@@ -147,7 +147,7 @@ class Shiplogic extends Data
             $parcels[]                   = $parcel;
         }
 
-        $body->parcels = $parcels;
+        $body->parcels        = $parcels;
         $body->declared_value = $parameters['declared_value'];
 
         if (!empty($parameters['opt_in_rates'])) {

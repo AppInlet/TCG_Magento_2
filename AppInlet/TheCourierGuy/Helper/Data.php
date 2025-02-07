@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright © 2024 App Inlet (Pty) Ltd . All rights reserved.
+ * Copyright © 2025 App Inlet (Pty) Ltd . All rights reserved.
  */
 
 namespace AppInlet\TheCourierGuy\Helper;
