@@ -1,13 +1,13 @@
 # Changelog
 
-## [1.2.1]()
+## [1.2.1](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.2.1)
 
 ### Fixed
 
 - Virtual products no longer displayed on Waybill.
 - Flat rate and free shipping work together as expected.
 
-## [1.2.0]()
+## [1.2.0](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.2.0)
 
 ### Added
 
