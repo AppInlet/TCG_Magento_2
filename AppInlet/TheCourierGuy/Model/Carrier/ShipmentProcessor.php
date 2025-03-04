@@ -185,6 +185,7 @@ class ShipmentProcessor
         $createShipmentBody->special_instructions_delivery   = '';
         $createShipmentBody->declared_value                  = $body['declared_value'];
         $createShipmentBody->service_level_code              = $body['service_level_code'];
+        $createShipmentBody->customer_reference              = $order->getIncrementId();
 
         if ($returnShipment) {
             $createShipmentBody->delivery_contact = $collection_contact;

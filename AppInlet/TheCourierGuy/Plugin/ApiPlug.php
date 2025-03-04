@@ -109,7 +109,6 @@ class ApiPlug
     protected function prepareData($quoteParams, $quote)
     {
         $items      = $quoteParams['contents'];
-        $total      = (float)$quote->getGrandTotal();
         $items_data = [];
 
         foreach ($items as $item) {
@@ -152,7 +151,7 @@ class ApiPlug
                 "code"           => $details['destperpcode']
             ],
             "parcels"             => $items_data,
-            "declared_value"      => $total,
+            "declared_value"      => 0.0,
             "collection_min_date" => $current_date,
             "delivery_min_date"   => $t2
         ];
