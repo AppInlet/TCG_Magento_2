@@ -1,6 +1,6 @@
 # TCG_Magento_2
 
-This is The Courier Guy plugin v1.2.1 for Magento v2.4.7.
+This is The Courier Guy plugin v1.2.2 for Magento v2.4.7.
 
 ## Installation
 
