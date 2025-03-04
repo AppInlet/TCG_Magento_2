@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.2.2)
+
+### Fixed
+
+- Remove default declared value field to disable forced shipping insurance.
+- Add Order Increment ID as customer_reference for Waybill.
+
 ## [1.2.1](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.2.1)
 
 ### Fixed
