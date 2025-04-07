@@ -4,7 +4,7 @@
 
     <head>
 
-        <css src="AppInlet_TheCourierGuy::css/places-dropdown.css" />
+        <css src="AppInlet_TheCourierGuy::css/places-dropdown.css"/>
         <script src="AppInlet_TheCourierGuy::js/view/places-dropdown-choices-controller.js"/>
         <script src="AppInlet_TheCourierGuy::js/view/places-dropdown-choices-formatter.js"/>
 

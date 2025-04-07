@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
     <router id="admin">
         <route id="return_shipment" frontName="return_shipment">
-            <module name="AppInlet_TheCourierGuy" />
+            <module name="AppInlet_TheCourierGuy"/>
         </route>
     </router>
 </config>

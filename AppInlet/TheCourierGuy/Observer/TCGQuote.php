@@ -47,49 +47,39 @@ class TCGQuote
         $this->monolog->info('In prepareQuote: Shipping method: ' . $shippingMethod);
 
         if (strpos($shippingMethod, 'appinlet_the_courier_guy_') === 0) {
-            //start of loop through items to create array version of items
-            $productData = [];
-
+            $productData   = [];
             $packageItemId = 0;
 
-            foreach ($order->getAllItems() as $key => $item) {
-                // Skip virtual products
+            $productRepo = \Magento\Framework\App\ObjectManager::getInstance()
+                ->get(\Magento\Catalog\Api\ProductRepositoryInterface::class);
+
+            foreach ($order->getAllItems() as $item) {
                 if ($item->getIsVirtual()) {
                     continue;
                 }
 
-                $lineItem             = [];
-                $lineItem['key']      = $packageItemId;
-                $lineItem['name']     = $item->getName();
-                $lineItem['quantity'] = $item->getQtyOrdered();
-                $lineItem['weight']   = $item->getQtyOrdered() * $item->getWeight();
+                $product = $productRepo->getById($item->getProductId());
 
-                $lineItem['length'] = $item->getLength();
-                $lineItem['width']  = $item->getWidth();
-                $lineItem['height'] = $item->getHeight();
+                $prodLength = $product->getData('length');
+                $prodWidth  = $product->getData('width');
+                $prodHeight = $product->getData('height');
+                $prodWeight = $product->getWeight();
 
-                if ($item->getLength() == "") {
-                    $lineItem['length'] = $this->helper->getConfig('typicallength'); /*if not set*/
-                }
+                $lineItem = [
+                    'key'      => $packageItemId,
+                    'name'     => $item->getName(),
+                    'quantity' => $item->getQtyOrdered(),
+                    'weight'   => $item->getQtyOrdered() * ($prodWeight ?: $this->helper->getConfig('typicalweight')),
+                    'length'   => $prodLength ?: $this->helper->getConfig('typicallength'),
+                    'width'    => $prodWidth ?: $this->helper->getConfig('typicalwidth'),
+                    'height'   => $prodHeight ?: $this->helper->getConfig('typicalheight'),
+                ];
 
-                if ($item->getWidth() == "") {
-                    $lineItem['width'] = $this->helper->getConfig('typicalwidth'); /*if not set*/
-                }
+                $this->monolog->info('Quote LineItem:', $lineItem);
 
-                if ($item->getHeight() == "") {
-                    $lineItem['height'] = $this->helper->getConfig('typicalheight'); /*if not set*/
-                }
-
-                if ($item->getWeight() == "") {
-                    $lineItem['weight'] = $item->getQty() * $this->helper->getConfig('typicalweight'); /*if not set*/
-                }
-
-                array_push($productData, $lineItem);
-
-                $packageItemId = $packageItemId + 1;
+                $productData[] = $lineItem;
+                $packageItemId++;
             }
-
-            //create array of destination details
 
             $requestDestinationDetails = [
                 "street"      => $order->getShippingAddress()->getData("street"),

@@ -5,20 +5,24 @@
  * See COPYING.txt for license details.
  */
 -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="carriers" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
             <resource>Dacod_ExternalLinkInNewTab::edit</resource>
-            <group id="appinlet_the_courier_guy" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="appinlet_the_courier_guy" type="text" sortOrder="200" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
                 <label>AppInlet TheCourierGuy</label>
 
-                <field id="active" translate="label" type="select" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="active" translate="label" type="select" sortOrder="300" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
                     <label>Active</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Method active?</comment>
                 </field>
 
-                <field id="title" translate="label comment" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="title" translate="label comment" type="text" sortOrder="400" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Title</label>
                     <comment>Appears at checkout</comment>
                     <depends>
@@ -28,7 +32,8 @@
                 </field>
 
 
-                <field id="name" translate="label comment" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="name" translate="label comment" type="text" sortOrder="500" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Method Name</label>
                     <comment>Appears at checkout</comment>
                     <depends>
@@ -37,7 +42,8 @@
                     <validate>required-entry validate-no-empty</validate>
                 </field>
 
-                <field id="account_number" translate="label comment" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="account_number" translate="label comment" type="text" sortOrder="600" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Account number</label>
                     <comment>The account number supplied by The Courier Guy for integration purposes.</comment>
                     <depends>
@@ -46,7 +52,8 @@
                     <validate>required-entry validate-no-empty</validate>
                 </field>
 
-                <field id="shiplogic_api_key" translate="label comment" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="shiplogic_api_key" translate="label comment" type="text" sortOrder="600" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>API Key</label>
                     <comment>Shiplogic API Key</comment>
                     <depends>
@@ -54,14 +61,16 @@
                     </depends>
                 </field>
 
-                <field id="sallowspecific" translate="label" type="select" sortOrder="800" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                <field id="sallowspecific" translate="label" type="select" sortOrder="800" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Ship to Applicable Countries</label>
                     <frontend_class>shipping-applicable-country</frontend_class>
                     <source_model>Magento\Shipping\Model\Config\Source\Allspecificcountries</source_model>
                 </field>
 
 
-                <field id="specificcountry" translate="label" type="multiselect" sortOrder="900" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="900" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
                     <label>Ship to Specific Countries</label>
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
                     <depends>
@@ -71,7 +80,8 @@
                 </field>
 
 
-                <field id="showmethod" translate="label" type="select" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="showmethod" translate="label" type="select" sortOrder="1000" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
                     <label>Show Method if Not Applicable</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
@@ -81,7 +91,8 @@
                 </field>
 
 
-                <field id="company" translate="label comment" type="text" sortOrder="1100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="company" translate="label comment" type="text" sortOrder="1100" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Company Name</label>
                     <comment>The name of your company.</comment>
                     <depends>
@@ -90,9 +101,12 @@
                     <validate>required-entry validate-no-empty</validate>
                 </field>
 
-                <field id="shop_address_1" translate="label comment" type="text" sortOrder="1200" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="shop_address_1" translate="label comment" type="text" sortOrder="1200" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Shop Address 1</label>
-                    <comment>The address used to calculate shipping, this is considered the collection point for the parcels being shipped.</comment>
+                    <comment>The address used to calculate shipping, this is considered the collection point for the
+                        parcels being shipped.
+                    </comment>
                     <depends>
                         <field id="active">1</field>
                     </depends>
@@ -100,15 +114,19 @@
                 </field>
 
 
-                <field id="shop_address_2" translate="label comment" type="text" sortOrder="1300" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="shop_address_2" translate="label comment" type="text" sortOrder="1300" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Shop Address 2</label>
-                    <comment>The address used to calculate shipping, this is considered the collection point for the parcels being shipped.</comment>
+                    <comment>The address used to calculate shipping, this is considered the collection point for the
+                        parcels being shipped.
+                    </comment>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
 
-                <field id="zone" translate="label comment" type="text" sortOrder="1400" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="zone" translate="label comment" type="text" sortOrder="1400" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Zone</label>
                     <comment>Shop Zone</comment>
                     <depends>
@@ -116,7 +134,8 @@
                     </depends>
                 </field>
 
-                <field id="city" translate="label comment" type="text" sortOrder="1400" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="city" translate="label comment" type="text" sortOrder="1400" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>City</label>
                     <comment>Shop City</comment>
                     <depends>
@@ -125,7 +144,8 @@
                 </field>
 
 
-                <field id="shop_postal_code" translate="label comment" type="text" sortOrder="1500" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="shop_postal_code" translate="label comment" type="text" sortOrder="1500" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Postal Code</label>
                     <comment>Shop postal Code.</comment>
                     <depends>
@@ -133,7 +153,8 @@
                     </depends>
                 </field>
 
-                <field id="shop_mobile" translate="label comment" type="text" sortOrder="1500" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="shop_mobile" translate="label comment" type="text" sortOrder="1500" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Telephone</label>
                     <comment>Shop Telephone Number.</comment>
                     <depends>
@@ -141,7 +162,8 @@
                     </depends>
                 </field>
 
-                <field id="shop_email" translate="label comment" type="text" sortOrder="1500" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="shop_email" translate="label comment" type="text" sortOrder="1500" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Email</label>
                     <comment>Shop Email id.</comment>
                     <depends>
@@ -150,7 +172,8 @@
                 </field>
 
 
-                <field id="excluderates" translate="label" type="multiselect" sortOrder="1600" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="excluderates" translate="label" type="multiselect" sortOrder="1600" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
                     <label>Exclude Rates</label>
                     <source_model>AppInlet\TheCourierGuy\Model\Config\Source\RatesList</source_model>
                     <depends>
@@ -160,7 +183,8 @@
                 </field>
 
 
-                <field id="percentagemarkup" translate="label comment" type="text" sortOrder="1700" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="percentagemarkup" translate="label comment" type="text" sortOrder="1700" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Percentage Markup</label>
                     <comment>Shipping price percentage markup - will be added to shipping price at checkout.</comment>
                     <depends>
@@ -170,8 +194,8 @@
                 </field>
 
 
-
-                <field id="freeshippingminimum" translate="label comment" type="text" sortOrder="1800" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="freeshippingminimum" translate="label comment" type="text" sortOrder="1800" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Free Shipping If Grand Total is more than or equal to</label>
                     <comment>make shipping free if grand total is greater than or equal to</comment>
                     <depends>
@@ -180,7 +204,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="typicalweight" translate="label comment" type="text" sortOrder="1900" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="typicalweight" translate="label comment" type="text" sortOrder="1900" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Typical Product Weight (in KG)</label>
                     <comment>For when the weight is not set on an individual product level</comment>
                     <depends>
@@ -189,7 +214,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="typicalheight" translate="label comment" type="text" sortOrder="2000" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="typicalheight" translate="label comment" type="text" sortOrder="2000" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Typical Product Height (in CM)</label>
                     <comment>For when the height is not set on an individual product level</comment>
                     <depends>
@@ -198,7 +224,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="typicallength" translate="label comment" type="text" sortOrder="2100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="typicallength" translate="label comment" type="text" sortOrder="2100" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Typical Product Length (in CM)</label>
                     <comment>For when the length is not set on an individual product level</comment>
                     <depends>
@@ -207,7 +234,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="typicalwidth" translate="label comment" type="text" sortOrder="2200" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="typicalwidth" translate="label comment" type="text" sortOrder="2200" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Typical Product Width (in CM)</label>
                     <comment>For when the width is not set on an individual product level</comment>
                     <depends>
@@ -219,11 +247,13 @@
 
                 <!-- Parcels - Flyer Size -->
 
-                <field id="parcel_flyer_size_label" translate="label" type="label" sortOrder="2300" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="parcel_flyer_size_label" translate="label" type="label" sortOrder="2300" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Parcels - Medium Flyer Size</label>
                 </field>
 
-                <field id="length_of_flyer" translate="label comment" type="text" sortOrder="2400" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="length_of_flyer" translate="label comment" type="text" sortOrder="2400" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Length of Flyer</label>
                     <comment>Length of the Flyer</comment>
                     <depends>
@@ -232,7 +262,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="width_of_flyer" translate="label comment" type="text" sortOrder="2500" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="width_of_flyer" translate="label comment" type="text" sortOrder="2500" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Width of Flyer</label>
                     <comment>Width of Flyer</comment>
                     <depends>
@@ -241,7 +272,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="height_of_flyer" translate="label comment" type="text" sortOrder="2600" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="height_of_flyer" translate="label comment" type="text" sortOrder="2600" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Height of Flyer</label>
                     <comment>Height of Flyer</comment>
                     <depends>
@@ -252,11 +284,13 @@
 
                 <!-- Parcels - Medium Parcel Size -->
 
-                <field id="parcel_medium_size_label" translate="label" type="label" sortOrder="2700" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="parcel_medium_size_label" translate="label" type="label" sortOrder="2700" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Parcels - Medium Parcel Size</label>
                 </field>
 
-                <field id="length_of_medium_parcel" translate="label comment" type="text" sortOrder="2800" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="length_of_medium_parcel" translate="label comment" type="text" sortOrder="2800"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Length of Medium Parcel Size</label>
                     <comment>Length of Medium Parcel Size</comment>
                     <depends>
@@ -265,7 +299,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="width_of_medium_parcel" translate="label comment" type="text" sortOrder="2900" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="width_of_medium_parcel" translate="label comment" type="text" sortOrder="2900"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Width of Medium Parcel Size</label>
                     <comment>Width of Medium Parcel Size</comment>
                     <depends>
@@ -274,7 +309,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="height_of_medium_parcel" translate="label comment" type="text" sortOrder="3000" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="height_of_medium_parcel" translate="label comment" type="text" sortOrder="3000"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Height of Medium Parcel Size</label>
                     <comment>Height of Medium Parcel Size</comment>
                     <depends>
@@ -286,11 +322,13 @@
 
                 <!-- Parcels - Large Parcel Size -->
 
-                <field id="parcel_large_size_label" translate="label" type="label" sortOrder="3100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="parcel_large_size_label" translate="label" type="label" sortOrder="3100" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Parcels - Large Parcel Size</label>
                 </field>
 
-                <field id="length_of_large_parcel" translate="label comment" type="text" sortOrder="3200" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="length_of_large_parcel" translate="label comment" type="text" sortOrder="3200"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Length of Large Parcel Size</label>
                     <comment>Length of Large Parcel Size</comment>
                     <depends>
@@ -299,7 +337,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="width_of_large_parcel" translate="label comment" type="text" sortOrder="3300" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="width_of_large_parcel" translate="label comment" type="text" sortOrder="3300"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Width of Large Parcel Size</label>
                     <comment>Width of Large Parcel Size</comment>
                     <depends>
@@ -308,7 +347,8 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="height_large_parcel" translate="label comment" type="text" sortOrder="3400" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="height_large_parcel" translate="label comment" type="text" sortOrder="3400" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Height of Large Parcel Size</label>
                     <comment>Height of Large Parcel Size</comment>
                     <depends>
@@ -318,11 +358,13 @@
                 </field>
 
 
-                <field id="specificerrmsg" translate="label" type="textarea" sortOrder="3500" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="specificerrmsg" translate="label" type="textarea" sortOrder="3500" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Displayed Error Message</label>
                 </field>
 
-                <field id="flat_rate_active" translate="label" type="select" sortOrder="3600" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="flat_rate_active" translate="label" type="select" sortOrder="3600" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Enable flat rate cost to customer</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
@@ -330,9 +372,10 @@
                     </depends>
                     <comment>Enable flat rate cost to customer?</comment>
 
-                 </field>
+                </field>
 
-                <field id="flat_rate" translate="label comment" type="text" sortOrder="3700" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="flat_rate" translate="label comment" type="text" sortOrder="3700" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Flate Rate</label>
                     <comment>Flat Rate Cost To Customer</comment>
                     <depends>
@@ -341,12 +384,14 @@
                     <validate>required-entry validate-no-empty validate-number</validate>
                 </field>
 
-                <field id="disable_tcg_shipment_at_create_shipment" translate="label comment" type="select" sortOrder="3850" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="disable_tcg_shipment_at_create_shipment" translate="label comment" type="select"
+                       sortOrder="3850" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Disable TCG shipment on create shipment</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 
-                <field id="disable_boxes_depot" translate="label" type="select" sortOrder="3900" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="disable_boxes_depot" translate="label" type="select" sortOrder="3900" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Disable Boxes and Depot</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Disable Boxes and Depot Options?</comment>

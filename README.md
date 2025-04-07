@@ -1,6 +1,6 @@
 # TCG_Magento_2
 
-This is The Courier Guy plugin v1.2.2 for Magento v2.4.7.
+This is The Courier Guy plugin v1.2.3 for Magento v2.4.7.
 
 ## Installation
 
@@ -26,10 +26,10 @@ automatically available. This document explains how to add and configure these a
 
 ### Shipping costs are calculated by:
 
-1.  **Retrieving** product dimensions (length, width, height) and weight from the ordered items.
-2.  **Falling back** to default values configured in the module's config settings if any dimension or weight is missing.
-3.  **Generating** a shipping request with product details and destination information.
-4.  **Communicating** with The Courier Guy API to retrieve shipping rates.
+1. **Retrieving** product dimensions (length, width, height) and weight from the ordered items.
+2. **Falling back** to default values configured in the module's config settings if any dimension or weight is missing.
+3. **Generating** a shipping request with product details and destination information.
+4. **Communicating** with The Courier Guy API to retrieve shipping rates.
 
 ### Adding Product Dimension Attributes
 

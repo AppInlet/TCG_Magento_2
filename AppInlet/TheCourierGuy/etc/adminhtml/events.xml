@@ -4,6 +4,6 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="sales_order_shipment_save_after">
         <observer name="appinlet_thecourierguy_sales_order_shipment_after"
-                  instance="AppInlet\TheCourierGuy\Observer\OrderShipped" />
+                  instance="AppInlet\TheCourierGuy\Observer\OrderShipped"/>
     </event>
 </config>

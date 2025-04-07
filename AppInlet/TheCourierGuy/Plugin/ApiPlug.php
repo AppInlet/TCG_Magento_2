@@ -112,16 +112,26 @@ class ApiPlug
         $items_data = [];
 
         foreach ($items as $item) {
-            $item_data                        = [];
-            $item_data['submitted_length_cm'] = (int)$item['length'];
-            $item_data['submitted_width_cm']  = (int)$item['width'];
-            $item_data['submitted_height_cm'] = (int)$item['height'];
-            $item_data['submitted_weight_kg'] = (int)$item['weight'];
-            array_push($items_data, $item_data);
+            $length = isset($item['length']) && $item['length'] > 0 ? (int)$item['length'] : 1;
+            $width  = isset($item['width']) && $item['width'] > 0 ? (int)$item['width'] : 1;
+            $height = isset($item['height']) && $item['height'] > 0 ? (int)$item['height'] : 1;
+            $weight = isset($item['weight']) && $item['weight'] > 0 ? (float)$item['weight'] : 1;
+            $qty    = isset($item['quantity']) && $item['quantity'] > 0 ? (int)$item['quantity'] : 1;
+
+            $unitWeight = round($weight / $qty, 2);
+
+            for ($i = 0; $i < $qty; $i++) {
+                $item_data    = [
+                    'submitted_length_cm' => $length,
+                    'submitted_width_cm'  => $width,
+                    'submitted_height_cm' => $height,
+                    'submitted_weight_kg' => $unitWeight,
+                ];
+                $items_data[] = $item_data;
+            }
         }
 
-        $details = $quoteParams['details'];
-
+        $details      = $quoteParams['details'];
         $current_date = date("Y-m-d");
         $t2           = date('Y-m-d', strtotime('+2 days'));
 

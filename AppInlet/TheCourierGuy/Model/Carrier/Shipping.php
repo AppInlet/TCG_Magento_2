@@ -6,6 +6,7 @@ use AppInlet\TheCourierGuy\Helper\Data as Helper;
 use AppInlet\TheCourierGuy\Logger\Logger as Monolog;
 use AppInlet\TheCourierGuy\Model\ShipmentFactory;
 use AppInlet\TheCourierGuy\Plugin\ApiPlug;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Checkout\Model\Cart;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -22,29 +23,13 @@ use Magento\Shipping\Model\Rate\Result;
 use Magento\Shipping\Model\Rate\ResultFactory;
 use Psr\Log\LoggerInterface;
 
-// does shipping for magento.
-
-
-class Shipping extends AbstractCarrier implements
-    CarrierInterface
+class Shipping extends AbstractCarrier implements CarrierInterface
 {
-    /**
-     * @var string
-     */
     protected $code = 'appinlet_the_courier_guy';
 
-    /**
-     * @var ResultFactory
-     */
     protected $rateResultFactory;
-
-    /**
-     * @var MethodFactory
-     */
     protected $rateMethodFactory;
-
     protected $quoteFactory;
-
     protected $quoteModel;
     protected ShipmentFactory $shipmentFactory;
     protected Monolog $monolog;
@@ -53,7 +38,7 @@ class Shipping extends AbstractCarrier implements
     protected Session $checkoutSession;
     protected LoggerInterface $logger;
     protected Cart $cart;
-
+    protected ProductRepositoryInterface $productRepo;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -69,79 +54,68 @@ class Shipping extends AbstractCarrier implements
         ShipmentFactory $shipmentFactory,
         QuoteFactory $quoteFactory,
         Quote $quoteModel,
+        ProductRepositoryInterface $productRepo,
         array $data = []
     ) {
-        $this->shipmentFactory = $shipmentFactory;
-
-        $this->checkoutSession = $checkoutSession;
-        $this->monolog         = $monolog;
-
-
-        $this->apiPlug = $apiPlug;
-
-        $this->helper = $helper;
-        $this->logger = $logger;
-
-        $this->cart = $cart;
-
+        $this->shipmentFactory   = $shipmentFactory;
+        $this->checkoutSession   = $checkoutSession;
+        $this->monolog           = $monolog;
+        $this->apiPlug           = $apiPlug;
+        $this->helper            = $helper;
+        $this->logger            = $logger;
+        $this->cart              = $cart;
         $this->rateResultFactory = $rateResultFactory;
         $this->rateMethodFactory = $rateMethodFactory;
-
-        $this->quoteFactory = $quoteFactory;
-        $this->quoteModel   = $quoteModel;
+        $this->quoteFactory      = $quoteFactory;
+        $this->quoteModel        = $quoteModel;
+        $this->productRepo       = $productRepo;
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
-    /**
-     * get allowed methods
-     * @return array
-     */
     public function getAllowedMethods()
     {
         return [$this->code => $this->helper->getConfig('title')];
     }
 
-
-    /**
-     * @param RateRequest $request
-     *
-     * @return bool|Result
-     */
     public function collectRates(RateRequest $request)
     {
         if (!$this->helper->getConfig('active')) {
             $this->monolog->info("TheCourierGuy plugin is not active");
-
             return false;
         }
 
-        $quote = $this->cart->getQuote();
         $items = $request->getAllItems();
-        if (empty($quote->getId())) {
-            foreach ($items as $item) {
-                /** @var Quote $quote */
-                $quote = $item->getQuote();
+        $quote = null;
+        foreach ($items as $item) {
+            /** @var \Magento\Quote\Model\Quote $quote */
+            $quote = $item->getQuote();
+            if ($quote && $quote->getId()) {
+                break;
             }
         }
+        if (!$quote || empty($quote->getId())) {
+            $this->monolog->info("No valid quote found in RateRequest items");
+            return $this->rateResultFactory->create();
+        }
+
         $grandTotal          = $quote->getGrandTotal();
+        $subtotal            = $quote->getSubtotal();
         $freeshippingminimum = $this->helper->getConfig('freeshippingminimum');
-
-        $quoteId = $quote->getId();
-        $result  = $this->rateResultFactory->create();
-
+        $quoteId             = $quote->getId();
+        $result              = $this->rateResultFactory->create();
 
         $shippingPrice = $this->helper->getConfig('flat_rate');
-        if ($grandTotal >= $freeshippingminimum) {
+        if ($subtotal >= $freeshippingminimum) {
             $shippingPrice = 0;
         }
 
-        $productData = array();
+        $productData = [];
         if ($request->getDestPostcode() && $request->getDestCity()) {
             $packageItemId = 0;
-            foreach ($items as $key => $item) {
-                $lineItem = $this->prepareLineItem($item, $packageItemId);
-                array_push($productData, $lineItem);
+            foreach ($items as $item) {
+                $lineItem      = $this->prepareLineItem($item, $packageItemId);
+                $productData[] = $lineItem;
                 $packageItemId++;
             }
         }
@@ -157,73 +131,76 @@ class Shipping extends AbstractCarrier implements
         if (!isset($shippingClasses['rates'][0])) {
             $error = $shippingClasses['message'];
             $this->monolog->info($error);
-
             return $result;
+        }
+
+        foreach ($shippingClasses['rates'] as $rate) {
+            $method = $this->setShippingMethod($shippingPrice, $rate, $shippingClasses);
+            $result->append($method);
+        }
+
+        $allRates      = $result->getAllRates();
+        $excludedRates = explode(",", $this->helper->getConfig('excluderates'));
+
+        foreach ($excludedRates as $exclude) {
+            foreach ($allRates as $rate) {
+                if ($rate->getData("method") === $exclude) {
+                    $rate->unsetData();
+                }
+            }
+        }
+
+        $rateValue         = (int)($shippingClasses['rates'][0]['rate']);
+        $percentage_markup = (int)($this->helper->getConfig('percentagemarkup'));
+
+        if ($this->helper->getConfig('flat_rate_active') == 1 && $grandTotal <= $freeshippingminimum) {
+            $shippingPrice = $this->helper->getConfig('flat_rate');
+            foreach ($allRates as $rate) {
+                $rate->setPrice($shippingPrice);
+            }
+        } elseif ($subtotal >= $freeshippingminimum) {
+            $shippingPrice = 0;
+            foreach ($allRates as $rate) {
+                $rate->setPrice($shippingPrice);
+                $rate->setData("method_title", "**FREE SHIPPING** " . $rate->getData("method_title"));
+            }
         } else {
-            foreach ($shippingClasses['rates'] as $rate) {
-                $method = $this->setShippingMethod($shippingPrice, $rate, $shippingClasses);
-                $result->append($method);
-            }
-
-            $allRates = $result->getAllRates();
-
-            $excludedRates = explode(",", $this->helper->getConfig('excluderates'));
-
-            for ($i = 0; $i < sizeof($excludedRates); $i++) {
-                for ($j = 0; $j < sizeof($allRates); $j++) {
-                    $rate = $allRates[$j];
-                    if ($rate->getData("method") === $excludedRates[$i]) {
-                        $rate->unsetData();
-                    }
-                }
-            }
-
-            /** make free if grand total is >= minimum free shipping amount */
-            $rate              = (int)($shippingClasses['rates'][0]['rate']);
-            $percentage_markup = (int)($this->helper->getConfig('percentagemarkup'));
-
-            if ($this->helper->getConfig('flat_rate_active') == 1 && $grandTotal <= $freeshippingminimum) {
-                $shippingPrice = $this->helper->getConfig('flat_rate');
-                foreach ($allRates as $rate) {
-                    $rate->setPrice($shippingPrice);
-                }
-            } elseif ($grandTotal >= $freeshippingminimum) {
-                $shippingPrice = 0;
-                foreach ($allRates as $rate) {
-                    $rate->setPrice($shippingPrice);
-                    $rate->setData("method_title", "**FREE SHIPPING** " . $rate->getData("method_title"));
-                }
-            } else {
-                $shippingPrice = $rate + (($percentage_markup / 100) * $rate);
-            }
+            $shippingPrice = $rateValue + (($percentage_markup / 100) * $rateValue);
         }
 
         return $result;
     }
 
-    /**
-     * @param $item
-     * @param $packageItemId
-     *
-     * @return array
-     */
     public function prepareLineItem($item, $packageItemId)
     {
-        $length     = $this->helper->getConfig('typicallength');
-        $width      = $this->helper->getConfig('typicalwidth');
-        $height     = $this->helper->getConfig('typicalheight');
-        $weight     = $item->getQty() * $this->helper->getConfig('typicalweight');
-        $itemWeight = $item->getQty() * $item->getWeight();
+        $defaultLength = (float)$this->helper->getConfig('typicallength');
+        $defaultWidth  = (float)$this->helper->getConfig('typicalwidth');
+        $defaultHeight = (float)$this->helper->getConfig('typicalheight');
+        $defaultWeight = (float)$this->helper->getConfig('typicalweight');
 
-        return array(
+        $product = $this->productRepo->getById(
+            $item->getProduct()->getId(),
+            false,
+            $item->getStoreId(),
+            false
+        );
+
+        $prodLength = $product->getData('length');
+        $prodWidth  = $product->getData('width');
+        $prodHeight = $product->getData('height');
+        $prodWeight = $product->getWeight();
+
+        $itemWeight = $item->getQty() * ($prodWeight ?: $defaultWeight);
+
+        return [
             'key'      => $packageItemId,
             'name'     => $item->getName(),
             'quantity' => $item->getQty(),
-            'weight'   => $itemWeight ? $itemWeight : $weight,
-            'length'   => $item->getLength() ? $item->getLength() : $length,
-            'width'    => $item->getWidth() ? $item->getWidth() : $width,
-            'height'   => $item->getHeight() ? $item->getHeight() : $height,
-        );
+            'weight'   => $itemWeight,
+            'length'   => $prodLength ?: $defaultLength,
+            'width'    => $prodWidth ?: $defaultWidth,
+            'height'   => $prodHeight ?: $defaultHeight,
+        ];
     }
 
     protected function setShippingMethod($shippingPrice, $rate, $shippingClasses)
@@ -231,15 +208,11 @@ class Shipping extends AbstractCarrier implements
         $method = $this->rateMethodFactory->create();
 
         $method->setShippingclasses($shippingClasses);
-
         $method->setCarrier($this->code);
         $method->setCarrierTitle($this->helper->getConfig('title'));
-
         $method->setMethod($rate['service_level']['code']);
         $method->setMethodTitle($rate['service_level']['name']);
-
         $method->setPrice($rate['rate']);
-
         $method->setCost($rate['rate']);
 
         return $method;
