@@ -1,6 +1,6 @@
 require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model/shipping-rate-registry'],
 
-  function ($, quote, rateRegistry) {
+  function ($, quote, rateRegistry){
 
     let placesTypingTimer; //timer identifier
     let cityTypingTimer;     //timer identifier
@@ -9,7 +9,7 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
     //get address from quote observable
     const address = quote.shippingAddress();
 
-    if (address != null) {
+    if(address != null){
 
       //changes the object so observable sees it as changed
       address.trigger_reload = new Date().getTime();
@@ -28,18 +28,18 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
     }
 
     //on keyup, start the countdown
-    $(document).on('keyup', 'input.choices__input.choices__input--cloned', function () {
+    $(document).on('keyup', 'input.choices__input.choices__input--cloned', function (){
       clearTimeout(placesTypingTimer);
       placesTypingTimer = setTimeout(lookPlaceUp.bind(null, $(this)), doneTypingInterval);
     });
 
     //on keydown, clear the countdown
-    $(document).on('keydown', 'input.choices__input.choices__input--cloned', function () {
+    $(document).on('keydown', 'input.choices__input.choices__input--cloned', function (){
       clearTimeout(placesTypingTimer);
     });
 
     //update places and classes if address if update after first load
-    $(document).on('change', '[name="city"]', function () {
+    $(document).on('change', '[name="city"]', function (){
 
       clearTimeout(cityTypingTimer);
 
@@ -49,7 +49,7 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
     //update places and classes if address if update after first load
 
-    $(document).on('keydown', '[name="city"]', function () {
+    $(document).on('keydown', '[name="city"]', function (){
 
       clearTimeout(cityTypingTimer);
 
@@ -57,7 +57,7 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
     //update quote when city in main address changes
 
-    function updatePlacesAndShippingClasses () {
+    function updatePlacesAndShippingClasses(){
 
       const searchTerm = $('[name="city"]').val();
 
@@ -65,22 +65,22 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
       const apiUrl = window.location.origin + '/rest/V1/appinlet-thecourierguy/get-place-by-name';
 
-      if (searchTerm !== '') {
+      if(searchTerm !== ''){
 
-        if (typeof window.placesCustomTemplate != 'undefined') {
+        if(typeof window.placesCustomTemplate != 'undefined'){
 
           $.ajax({
 
-            url: apiUrl,
-            type: 'POST',
-            beforeSend: function (xhr) {
+            url       : apiUrl,
+            type      : 'POST',
+            beforeSend: function (xhr){
               xhr.setRequestHeader('Content-Type', 'application/json');
             },
-            dataType: 'json',
-            data: JSON.stringify({
+            dataType  : 'json',
+            data      : JSON.stringify({
               place_name: searchTerm
             }),
-            success: function (data) {
+            success   : function (data){
 
               window.placesCollection = data;
 
@@ -88,17 +88,17 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
               var selectValues = [];
 
-              $.each(data, function (index, val) {
+              $.each(data, function (index, val){
 
-                if (index === 0) {
+                if(index === 0){
 
                   selectValues.push({
-                    value: val['place'],
-                    label: val['town'],
+                    value           : val['place'],
+                    label           : val['town'],
                     customProperties: {
                       pcode: val['pcode']
                     },
-                    selected: true
+                    selected        : true
                   });
 
                   $('[name="postcode"]').val(val['pcode']);
@@ -107,8 +107,8 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
                   selectValues.push(
                     {
-                      value: val['place'],
-                      label: val['town'],
+                      value           : val['place'],
+                      label           : val['town'],
                       customProperties: {
                         pcode: val['pcode']
                       }
@@ -124,7 +124,7 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
               );
 
             },
-            error: function (xhr, resp, text) {
+            error     : function (xhr, resp, text){
               console.log(xhr.responseJSON);
 
             }
@@ -136,58 +136,58 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
       //update quote
 
-      if (address != null) {
+      if(address != null){
         quote.shippingAddress(address);
       }
       $('[name="postcode"]').keyup();
 
     }
 
-    function lookPlaceUp (element) {
+    function lookPlaceUp(element){
 
-      if (element.val() === $('input.choices__input.choices__input--cloned').first().val()) {
+      if(element.val() === $('input.choices__input.choices__input--cloned').first().val()){
 
         var searchTerm = element.val();
         var apiUrl = window.location.origin + '/rest/V1/appinlet-thecourierguy/get-place-by-name';
 
-        if (searchTerm !== '') {
+        if(searchTerm !== ''){
 
           $.ajax({
 
-            url: apiUrl,
-            type: 'POST',
-            beforeSend: function (xhr) {
+            url       : apiUrl,
+            type      : 'POST',
+            beforeSend: function (xhr){
               xhr.setRequestHeader('Content-Type', 'application/json');
             },
-            dataType: 'json',
-            data: JSON.stringify({
+            dataType  : 'json',
+            data      : JSON.stringify({
               place_name: searchTerm
             }),
-            success: function (data) {
+            success   : function (data){
 
               window.placesCustomTemplate.clearChoices();
 
               var selectValues = [];
 
-              $.each(data, function (index, val) {
+              $.each(data, function (index, val){
 
-                if (index === 0) {
+                if(index === 0){
 
                   selectValues.push({
-                    value: val['place'],
-                    label: val['town'],
+                    value           : val['place'],
+                    label           : val['town'],
                     customProperties: {
                       pcode: val['pcode']
                     },
-                    selected: false
+                    selected        : false
                   });
 
                 } else {
 
                   selectValues.push(
                     {
-                      value: val['place'],
-                      label: val['town'],
+                      value           : val['place'],
+                      label           : val['town'],
                       customProperties: {
                         pcode: val['pcode']
                       }
@@ -203,7 +203,7 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
               );
 
             },
-            error: function (xhr, resp, text) {
+            error     : function (xhr, resp, text){
               console.log(xhr.responseJSON);
 
             }
@@ -214,22 +214,22 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
     }
 
     /* initiate dropdowns */
-    $(document).ready(function () {
+    $(document).ready(function (){
 
-      const placesDropdownExists = setInterval(function () {
+      const placesDropdownExists = setInterval(function (){
 
-        if ($('#places_classes').length) {
+        if($('#places_classes').length){
 
           clearInterval(placesDropdownExists);
 
           var placesDropDownElement = document.getElementById('places_classes');
 
           window.placesCustomTemplate = new Choices(placesDropDownElement, {
-            callbackOnCreateTemplates: function (strToEl) {
+            callbackOnCreateTemplates: function (strToEl){
               var classNames = this.config.classNames;
               var itemSelectText = this.config.itemSelectText;
               return {
-                item: function (classNames, data) {
+                item  : function (classNames, data){
                   return strToEl('\
                             <div\
                               class="place' + String(classNames.item) + ' ' + String(data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"\
@@ -243,7 +243,7 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
                             </div>\
                           ');
                 },
-                choice: function (classNames, data) {
+                choice: function (classNames, data){
                   return strToEl('\
                       <div\
                         class="' + String(classNames.item) + ' ' + String(classNames.itemChoice) + ' ' + String(data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '"\
@@ -264,11 +264,11 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
           placesDropDownElement.addEventListener(
             'addItem',
-            function (event) {
+            function (event){
 
-              if (event.detail.customProperties == null) {
+              if(event.detail.customProperties == null){
 
-                if ($('[name="city"]').val() !== event.detail.label) {
+                if($('[name="city"]').val() !== event.detail.label){
 
                   $('[name="city"]').val(event.detail.label);
 
@@ -277,20 +277,20 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
               } else {
 
-                if ($('[name="postcode"]').val() !== event.detail.customProperties.pcode) {
+                if($('[name="postcode"]').val() !== event.detail.customProperties.pcode){
 
                   $('[name="postcode"]').val(event.detail.customProperties.pcode);
 
                 }
 
-                if ($('[name="city"]').val() !== event.detail.label) {
+                if($('[name="city"]').val() !== event.detail.label){
 
                   $('[name="city"]').val(event.detail.label);
 
                   //get address from quote observable
                   var address = quote.shippingAddress();
 
-                  if (address != null) {
+                  if(address != null){
 
                     var address = quote.shippingAddress();
                     rateRegistry.set(address.getKey(), null);
@@ -306,7 +306,7 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
           );
 
           //get places by city on load if city is set and list is empty
-          if (typeof window.placesCollection != 'undefined' && window.placesCollection.length === 0) {
+          if(typeof window.placesCollection != 'undefined' && window.placesCollection.length === 0){
 
             updatePlacesAndShippingClasses();
 
@@ -314,13 +314,13 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
           //show shipping classes on load if not visible
 
-          if (!$('#shipping_classes').length) {
+          if(!$('#shipping_classes').length){
 
             let options = '';
 
-            if (typeof window.shippingClassesCollection != 'undefined') {
+            if(typeof window.shippingClassesCollection != 'undefined'){
 
-              window.shippingClassesCollection.forEach(function (item, index) {
+              window.shippingClassesCollection.forEach(function (item, index){
 
                 options = options + '<option value=\'' + item.value + '\'>' + item.label + '</option>';
 
@@ -328,7 +328,7 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
 
             }
             //load shipping classes
-            if ($('#tcgShippingClasses').length != 1) {
+            if($('#tcgShippingClasses').length != 1){
             }
 
           }
@@ -336,18 +336,18 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
         }
       }, 100); // check every 100ms
 
-      const shippingClassesDropdownExists = setInterval(function () {
+      const shippingClassesDropdownExists = setInterval(function (){
 
-        if ($('#shipping_classes').length) {
+        if($('#shipping_classes').length){
 
           clearInterval(shippingClassesDropdownExists);
 
           window.shippingClassesCustomTemplate = new Choices(document.getElementById('shipping_classes'), {
-            callbackOnCreateTemplates: function (strToEl) {
+            callbackOnCreateTemplates: function (strToEl){
               var classNames = this.config.classNames;
               var itemSelectText = this.config.itemSelectText;
               return {
-                item: function (classNames, data) {
+                item  : function (classNames, data){
                   return strToEl('\
                             <div\
                               class="service' + String(classNames.item) + ' ' + String(data.highlighted ? classNames.highlightedState : classNames.itemSelectable) + '"\
@@ -361,7 +361,7 @@ require(['jquery', 'Magento_Checkout/js/model/quote', 'Magento_Checkout/js/model
                             </div>\
                           ');
                 },
-                choice: function (classNames, data) {
+                choice: function (classNames, data){
                   return strToEl('\
                       <div\
                         class="' + String(classNames.item) + ' ' + String(classNames.itemChoice) + ' ' + String(data.disabled ? classNames.itemDisabled : classNames.itemSelectable) + '"\

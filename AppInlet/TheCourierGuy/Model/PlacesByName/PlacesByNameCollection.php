@@ -58,7 +58,7 @@ class PlacesByNameCollection implements PlacesByNameInterface
         $places = $this->apiPlug->getAllPlacesByName($payload['place_name']);
         if ($this->getConfig("disable_boxes_depot") == 1) {
             if (count($places) >= 1) {
-                $replaceTerms = array('boxes', 'depot');
+                $replaceTerms = ['boxes', 'depot'];
                 foreach ($places as $key => $place) {
                     $town = strtolower($place['town']);
                     foreach ($replaceTerms as $term) {

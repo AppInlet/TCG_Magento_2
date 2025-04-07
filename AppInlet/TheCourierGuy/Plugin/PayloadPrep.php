@@ -501,8 +501,7 @@ class PayloadPrep
             for ($i = 0; $i < count($dimensions); $i++) {
                 if (count($pool) > 0) {
                     for ($p = 0; $p < count($pool); $p++) {
-                        if (
-                            $dimensions[$i]['dim'][0] === $pool[$p]['dim'][0]
+                        if ($dimensions[$i]['dim'][0] === $pool[$p]['dim'][0]
                             && $dimensions[$i]['dim'][1] === $pool[$p]['dim'][1]
                             && $dimensions[$i]['dim'][2] === $pool[$p]['dim'][2]
                         ) {
@@ -529,8 +528,7 @@ class PayloadPrep
                 for ($j = 0; $j < count($dimensions); $j++) {
                     if ($i < $j) {
                         if ($dimensions[$i]['vol'] === $dimensions[$j]['vol']) {
-                            if (
-                                $dimensions[$i]['dim'][0] === $dimensions[$j]['dim'][0]
+                            if ($dimensions[$i]['dim'][0] === $dimensions[$j]['dim'][0]
                                 && $dimensions[$i]['dim'][1] === $dimensions[$j]['dim'][1]
                                 && $dimensions[$i]['dim'][2] === $dimensions[$j]['dim'][2]
                             ) {
@@ -553,28 +551,27 @@ class PayloadPrep
                                     break 2;
                                 } else {
                                     for ($p = 0; $p < count($pool); $p++) {
-                                        if (
-                                            $dimensions[$i]['dim'][0] === $pool[$p]['dim'][0]
+                                        if ($dimensions[$i]['dim'][0] === $pool[$p]['dim'][0]
                                             && $dimensions[$i]['dim'][1] === $pool[$p]['dim'][1]
                                             && $dimensions[$i]['dim'][2] === $pool[$p]['dim'][2]
                                         ) {
                                             $match             = true;
                                             $newCount          = intval($pool[$p]) + intval(
-                                                    $dimensions[$i]['count']
-                                                ) + intval(
-                                                                     $dimensions[$j]['count']
-                                                                 );
+                                                $dimensions[$i]['count']
+                                            ) + intval(
+                                                $dimensions[$j]['count']
+                                            );
                                             $newMass           = intval($pool[$p]['mass']) * intval(
-                                                    $pool[$p]['count']
-                                                ) + intval(
-                                                        $dimensions[$i]['count']
-                                                    ) * intval(
-                                                        $dimensions[$i]['mass']
-                                                    ) + intval(
-                                                            $dimensions[$i]['count']
-                                                        ) * intval(
-                                                            $dimensions[$i]['mass']
-                                                        );
+                                                $pool[$p]['count']
+                                            ) + intval(
+                                                $dimensions[$i]['count']
+                                            ) * intval(
+                                                $dimensions[$i]['mass']
+                                            ) + intval(
+                                                $dimensions[$i]['count']
+                                            ) * intval(
+                                                $dimensions[$i]['mass']
+                                            );
                                             $newMass           /= $newCount;
                                             $pool[$p]['count'] = $newCount;
                                             $pool[$p]['mass']  = $newMass;
@@ -699,8 +696,7 @@ class PayloadPrep
 
         rsort($productDims);
         $fits = false;
-        if (
-            $productDims[0] <= $parcel[0]
+        if ($productDims[0] <= $parcel[0]
             && $productDims[1] <= $parcel[1]
             && $productDims[2] <= $parcel[2]
         ) {

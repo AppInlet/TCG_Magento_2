@@ -176,10 +176,8 @@ class ShipmentProcessor
         $createShipmentBody->delivery_contact = $delivery_contact;
         $createShipmentBody->delivery_address = $delivery_address;
 
-        $parcels = $body['parcels'];
+        $createShipmentBody->parcels = $body['parcels'];
 
-
-        $createShipmentBody->parcels = $parcels;
 
         $createShipmentBody->special_instructions_collection = '';
         $createShipmentBody->special_instructions_delivery   = '';

@@ -5,9 +5,6 @@ namespace AppInlet\TheCourierGuy\Model\ResourceModel\Shipment;
 use AppInlet\TheCourierGuy\Model\ResourceModel\Shipment;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
-/**
- * Class Collection
- */
 class Collection extends AbstractCollection
 {
     /**

@@ -43,7 +43,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     {
         $table = $setup->getConnection()->newTable(
             $setup->getTable('appinlet_theCourierguy_shipping')
-        //using quote number as entity id $order->getQuoteId()
+            //using quote number as entity id $order->getQuoteId()
         )->addColumn(
             'entity_id',
             Table::TYPE_INTEGER,

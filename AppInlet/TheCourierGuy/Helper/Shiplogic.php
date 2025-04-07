@@ -139,17 +139,28 @@ class Shiplogic extends Data
         $parcelsArray             = $parameters['parcels'];
 
         foreach ($parcelsArray as $parcelArray) {
-            $parcel                      = new stdClass();
-            $parcel->submitted_length_cm = $parcelArray['submitted_length_cm'];
-            $parcel->submitted_width_cm  = $parcelArray['submitted_width_cm'];
-            $parcel->submitted_height_cm = $parcelArray['submitted_height_cm'];
-            $parcel->submitted_weight_kg = $parcelArray['submitted_weight_kg'];
-            $parcels[]                   = $parcel;
-        }
+            $quantity = $parcelArray['quantity'] ?? 1;
 
+            $length = $parcelArray['submitted_length_cm'] ?? null;
+            $width  = $parcelArray['submitted_width_cm'] ?? null;
+            $height = $parcelArray['submitted_height_cm'] ?? null;
+            $weight = $parcelArray['submitted_weight_kg'] ?? null;
+
+            if (!$length || !$width || !$height || !$weight) {
+                continue;
+            }
+
+            for ($i = 0; $i < $quantity; $i++) {
+                $parcel                      = new stdClass();
+                $parcel->submitted_length_cm = $length;
+                $parcel->submitted_width_cm  = $width;
+                $parcel->submitted_height_cm = $height;
+                $parcel->submitted_weight_kg = $weight;
+                $parcels[]                   = $parcel;
+            }
+        }
         $body->parcels        = $parcels;
         $body->declared_value = $parameters['declared_value'];
-
         if (!empty($parameters['opt_in_rates'])) {
             $body->opt_in_rates = $parameters['opt_in_rates'];
         }

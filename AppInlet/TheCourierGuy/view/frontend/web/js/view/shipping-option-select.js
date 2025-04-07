@@ -3,22 +3,22 @@
   'ko',
   'Magento_Ui/js/form/element/select',
   'Magento_Checkout/js/model/quote'
-], function ($, ko, select, quote) {
+], function ($, ko, select, quote){
   'use strict';
 
   let self;
 
   return select.extend({
 
-    initialize: function () {
+    initialize: function (){
       self = this;
       this._super();
 
-      quote.shippingMethod.subscribe(function () {
+      quote.shippingMethod.subscribe(function (){
 
         const method = quote.shippingMethod();
 
-        if (method && method['carrier_code'] !== undefined) {
+        if(method && method['carrier_code'] !== undefined){
           self.selectedShippingMethod = method;
           self.updateDropdownValues(method);
         }
@@ -33,26 +33,26 @@
      * @param value
      * @returns {Object} Chainable
      */
-    updateDropdownValues: function (method) {
+    updateDropdownValues: function (method){
 
-      let placesCollection = [],
-        places = [],
-        shippingClasses = [],
-        shippingClassesCollection = [];
+      let placesCollection          = [],
+          places                    = [],
+          shippingClasses           = [],
+          shippingClassesCollection = [];
 
-      if (typeof method['extension_attributes'] != 'undefined') {
+      if(typeof method['extension_attributes'] != 'undefined'){
         const methodAttributes = method['extension_attributes'];
-        if (typeof methodAttributes['places'] != 'undefined') {
+        if(typeof methodAttributes['places'] != 'undefined'){
           places = methodAttributes['places'];
         }
-        if (typeof methodAttributes['shippingclasses'] != 'undefined' && methodAttributes['shippingclasses'] != null && typeof methodAttributes['shippingclasses'][1] != 'undefined') {
+        if(typeof methodAttributes['shippingclasses'] != 'undefined' && methodAttributes['shippingclasses'] != null && typeof methodAttributes['shippingclasses'][1] != 'undefined'){
           shippingClasses = methodAttributes['shippingclasses'][1];
         }
       }
 
-      if (places != null && places.length !== 0) { //08-06-2021
+      if(places != null && places.length !== 0){ //08-06-2021
 
-        places.forEach(function (item, index) {
+        places.forEach(function (item, index){
 
           const placeObject = JSON.parse(item);
 
@@ -74,13 +74,13 @@
       /*hiding dropdowns*/
       self.updatePlacesDropdown(placesCollection); //08-06-2021
 
-      if (shippingClasses.length !== 0) {
+      if(shippingClasses.length !== 0){
 
-        Object.keys(shippingClasses).forEach(function (index) {
+        Object.keys(shippingClasses).forEach(function (index){
 
           const classObject = JSON.parse(shippingClasses)[index];
 
-          if (typeof classObject != 'undefined') {
+          if(typeof classObject != 'undefined'){
 
             const classNameAndPrice = classObject.name + ' - R ' + classObject.total;
 
@@ -102,20 +102,20 @@
 
     },
 
-    updatePlacesDropdown: function (value) {
+    updatePlacesDropdown: function (value){
 
       let options = '';
 
-      value.forEach(function (item, index) {
+      value.forEach(function (item, index){
 
         options = options + '<option value=\'' + item.value + '\'>' + item.label + '</option>';
 
       });
 
-      if (!$('#shipping_classes').length) {
+      if(!$('#shipping_classes').length){
 
         //load shipping classes
-        if ($('#tcgPlaces').length != 1) {
+        if($('#tcgPlaces').length != 1){
           $('.onestep-shipping-method').append('<br><br><span id="tcgPlaces" data-bind=\'i18n: element.label\'>If selecting Courier, please select your preferred Suburb/Area for delivery</span><p><select id=\'places_classes\'>' + options + '</select></p>');
         }
 
@@ -127,9 +127,9 @@
 
         const selectValues = [];
 
-        $.each(window.placesCollection, function (index, val) {
+        $.each(window.placesCollection, function (index, val){
 
-          if (index === 0) {
+          if(index === 0){
 
             selectValues.push({ value: val['value'], label: val['label'], selected: true });
 
@@ -150,20 +150,20 @@
 
     },
 
-    updateShippingClassesDropdown: function (value) {
+    updateShippingClassesDropdown: function (value){
 
       let options = '';
 
-      value.forEach(function (item, index) {
+      value.forEach(function (item, index){
 
         options = options + '<option value=\'' + item.value + '\'>' + item.label + '</option>';
 
       });
 
-      if (!$('#shipping_classes').length) {
+      if(!$('#shipping_classes').length){
 
         //load shipping classes
-        if ($('#tcgShippingClasses').length != 1) {
+        if($('#tcgShippingClasses').length != 1){
         }
 
       } else {
@@ -174,9 +174,9 @@
 
         const selectValues = [];
 
-        $.each(window.shippingClassesCollection, function (index, val) {
+        $.each(window.shippingClassesCollection, function (index, val){
 
-          if (index === 0) {
+          if(index === 0){
 
             selectValues.push({ value: val['value'], label: val['label'], selected: true });
 
