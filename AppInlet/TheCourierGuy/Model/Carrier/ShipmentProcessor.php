@@ -28,10 +28,6 @@ class ShipmentProcessor
      */
     private ShipmentTrackInterfaceFactory $trackFactory;
     /**
-     * @var Monolog
-     */
-    private Monolog $monolog;
-    /**
      * @var Helper
      */
     private Helper $helper;
@@ -74,7 +70,6 @@ class ShipmentProcessor
     public function __construct(
         ShipmentRepositoryInterface $shipmentRepository,
         ShipmentTrackInterfaceFactory $trackFactory,
-        Monolog $monolog,
         Helper $helper,
         Shiplogic $shipLogic,
         TCGQuote $tcgQuote,
@@ -85,7 +80,6 @@ class ShipmentProcessor
     ) {
         $this->shipmentRepository = $shipmentRepository;
         $this->trackFactory       = $trackFactory;
-        $this->monolog            = $monolog;
         $this->helper             = $helper;
         $this->tcgQuote           = $tcgQuote;
         $this->apiPlug            = $apiPlug;
@@ -182,9 +176,9 @@ class ShipmentProcessor
         $createShipmentBody->special_instructions_collection = '';
         $createShipmentBody->special_instructions_delivery   = '';
         $createShipmentBody->declared_value                  = $body['declared_value'];
+        $createShipmentBody->liability_cover                 = ($this->helper->isInsuranceEnabled() && $body['declared_value'] > 0) ? 'Y' : 'N';
         $createShipmentBody->service_level_code              = $body['service_level_code'];
         $createShipmentBody->customer_reference              = $order->getIncrementId();
-
         if ($returnShipment) {
             $createShipmentBody->delivery_contact = $collection_contact;
             $createShipmentBody->delivery_address = $collection_address;
@@ -195,7 +189,6 @@ class ShipmentProcessor
 
         return $createShipmentBody;
     }
-
     /**
      * @throws GuzzleException
      */
@@ -215,16 +208,23 @@ class ShipmentProcessor
 
         $shipLogicApi = $this->shipLogic;
 
-        $body                       = $this->apiPlug->prepare_api_data(
+        $declaredValue = 0.0;
+        if ($this->helper->isInsuranceEnabled()) {
+            foreach ($order->getAllVisibleItems() as $item) {
+                $declaredValue += $item->getQtyOrdered() * $item->getPrice();
+            }
+            $declaredValue = round($declaredValue, 2);
+        }
+        $body = $this->apiPlug->prepare_api_data(
             $requestDestinationDetails,
             $productData,
             $quote,
-            $orderIncrementId
+            $orderIncrementId,
+            ['declared_value' => (float)$declaredValue]
         );
+
         $body['service_level_code'] = $shippingMethodCode;
-
         $request_body = $this->createShipmentBody($order, $body, $observerShipment === null);
-
         $response = $shipLogicApi->createShipment($request_body);
         $response = json_decode($response);
 
@@ -249,9 +249,8 @@ class ShipmentProcessor
                     $this->shipmentSender->send($observerShipment);
                     $observerShipment->setEmailSent(true);
                 }
-            } catch (Exception $e) {
-                $this->monolog->error($e->getMessage());
-            }
+            } catch (\Exception $e) {$this->helper->log($e->getMessage(), 'error');}
         }
+        $order->save();
     }
 }

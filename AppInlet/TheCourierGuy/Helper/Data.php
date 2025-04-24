@@ -15,7 +15,8 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\PageCache\Version;
 use Magento\Store\Model\ScopeInterface;
-
+use Psr\Log\LoggerInterface;
+use AppInlet\TheCourierGuy\Plugin\ShipLogicApiPayload;
 class Data extends AbstractHelper
 {
     public const XML_PATH_CATALOG = 'carriers/';
@@ -24,6 +25,7 @@ class Data extends AbstractHelper
      * @var WriterInterface
      */
     protected $configWriter;
+    protected LoggerInterface $logger;
 
     /**
      * @var TypeListInterface
@@ -34,6 +36,7 @@ class Data extends AbstractHelper
      * @var Pool
      */
     protected $cacheFrontendPool;
+    protected ShipLogicApiPayload $shipLogicApiPayload;
 
     /**
      * Data constructor.
@@ -42,16 +45,22 @@ class Data extends AbstractHelper
      * @param WriterInterface $configWriter
      * @param TypeListInterface $cacheTypeList
      * @param Pool $cacheFrontendPool
+     * @param LoggerInterface $logger
+     * @param ShipLogicApiPayload $shipLogicApiPayload
      */
     public function __construct(
         Context $context,
         WriterInterface $configWriter,
         TypeListInterface $cacheTypeList,
-        Pool $cacheFrontendPool
+        Pool $cacheFrontendPool,
+        LoggerInterface $logger,
+        ShipLogicApiPayload $shipLogicApiPayload,
     ) {
-        $this->configWriter      = $configWriter;
-        $this->cacheTypeList     = $cacheTypeList;
-        $this->cacheFrontendPool = $cacheFrontendPool;
+        $this->configWriter              = $configWriter;
+        $this->cacheTypeList             = $cacheTypeList;
+        $this->cacheFrontendPool         = $cacheFrontendPool;
+        $this->logger                    = $logger;
+        $this->shipLogicApiPayload       = $shipLogicApiPayload;
         parent::__construct($context);
     }
 
@@ -116,5 +125,9 @@ class Data extends AbstractHelper
         foreach ($this->cacheFrontendPool as $cacheFrontend) {
             $cacheFrontend->getBackend()->clean();
         }
+    }
+    public function isInsuranceEnabled(): bool
+    {
+        return $this->getConfig('enable_insurance') === '1';
     }
 }

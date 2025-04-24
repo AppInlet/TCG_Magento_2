@@ -6,7 +6,9 @@ use AppInlet\TheCourierGuy\Helper\Data as Helper;
 use AppInlet\TheCourierGuy\Logger\Logger as Monolog;
 use AppInlet\TheCourierGuy\Model\ShipmentFactory;
 use AppInlet\TheCourierGuy\Plugin\ApiPlug;
+use AppInlet\TheCourierGuy\Plugin\ShipLogicApiPayload;
 use Magento\Quote\Model\QuoteFactory;
+use stdClass;
 
 class TCGQuote
 {
@@ -16,19 +18,22 @@ class TCGQuote
     private Helper $helper;
     private QuoteFactory $quoteFactory;
     private ShipmentFactory $shipmentFactory;
+    private ShipLogicApiPayload $shipLogicApiPayload;
 
     public function __construct(
         ShipmentFactory $shipmentFactory,
         ApiPlug $apiPlug,
         Monolog $monolog,
         Helper $helper,
-        QuoteFactory $quoteFactory
+        QuoteFactory $quoteFactory,
+        ShipLogicApiPayload $shipLogicApiPayload,
     ) {
         $this->quoteFactory    = $quoteFactory;
         $this->helper          = $helper;
         $this->shipmentFactory = $shipmentFactory;
         $this->apiPlug         = $apiPlug;
         $this->monolog         = $monolog;
+        $this->shipLogicApiPayload = $shipLogicApiPayload;
     }
 
     /**
@@ -58,6 +63,10 @@ class TCGQuote
                     continue;
                 }
 
+                if ($item->getProductType() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                    continue;
+                }
+
                 $product = $productRepo->getById($item->getProductId());
 
                 $prodLength = $product->getData('length');
@@ -68,17 +77,56 @@ class TCGQuote
                 $lineItem = [
                     'key'      => $packageItemId,
                     'name'     => $item->getName(),
-                    'quantity' => $item->getQtyOrdered(),
-                    'weight'   => $item->getQtyOrdered() * ($prodWeight ?: $this->helper->getConfig('typicalweight')),
-                    'length'   => $prodLength ?: $this->helper->getConfig('typicallength'),
-                    'width'    => $prodWidth ?: $this->helper->getConfig('typicalwidth'),
-                    'height'   => $prodHeight ?: $this->helper->getConfig('typicalheight'),
+                    'quantity' => (int)$item->getQtyOrdered(),
+                    'weight'   => (int)($prodWeight ?: $this->helper->getConfig('typicalweight')),
+                    'length'   => (int)($prodLength ?: $this->helper->getConfig('typicallength')),
+                    'width'    => (int)($prodWidth ?: $this->helper->getConfig('typicalwidth')),
+                    'height'   => (int)($prodHeight ?: $this->helper->getConfig('typicalheight')),
                 ];
 
                 $this->monolog->info('Quote LineItem:', $lineItem);
 
                 $productData[] = $lineItem;
                 $packageItemId++;
+            }
+
+            $parcelsArray = $this->shipLogicApiPayload->getContentsPayload($this->apiPlug->gatherBoxSizes(), $productData);
+
+            $parcels      = [];
+
+            unset($parcelsArray['fitsFlyer']);
+
+            foreach ($parcelsArray as $parcelArray) {
+                $parcel                        = new stdClass();
+                $parcel->submitted_length_cm   = $parcelArray['dim1'];
+                $parcel->submitted_width_cm    = $parcelArray['dim2'];
+                $parcel->submitted_height_cm   = $parcelArray['dim3'];
+                $parcel->submitted_description = $this->removeTrailingComma($parcelArray['description']);
+                $parcel->item_count            = $parcelArray['itemCount'];
+                $parcel->submitted_weight_kg   = $parcelArray['actmass'];
+                $parcels[]                     = $parcel;
+            }
+
+            foreach ($parcelsArray as $parcelArray) {
+                $quantity = $parcelArray['quantity'] ?? 1;
+
+                $length = $parcelArray['submitted_length_cm'] ?? null;
+                $width  = $parcelArray['submitted_width_cm'] ?? null;
+                $height = $parcelArray['submitted_height_cm'] ?? null;
+                $weight = $parcelArray['submitted_weight_kg'] ?? null;
+
+                if (!$length || !$width || !$height || !$weight) {
+                    continue;
+                }
+
+                for ($i = 0; $i < $quantity; $i++) {
+                    $parcel                      = new stdClass();
+                    $parcel->submitted_length_cm = $length;
+                    $parcel->submitted_width_cm  = $width;
+                    $parcel->submitted_height_cm = $height;
+                    $parcel->submitted_weight_kg = $weight;
+                    $parcels[]                   = $parcel;
+                }
             }
 
             $requestDestinationDetails = [
@@ -89,7 +137,7 @@ class TCGQuote
 
             $result = [
                 'requestDestinationDetails' => $requestDestinationDetails,
-                'productData'               => $productData,
+                'productData'               => $parcels,
                 'quote'                     => $quote,
                 'orderIncrementId'          => $orderIncrementId,
             ];
@@ -98,20 +146,15 @@ class TCGQuote
         return $result;
     }
 
-    public function createQuote($order)
+    public function removeTrailingComma($string)
     {
-        $quote_data = $this->prepareQuote($order);
+        $lastOccurrence = strrpos($string, ', ');
 
-        $requestDestinationDetails = $quote_data['requestDestinationDetails'];
-        $productData               = $quote_data['productData'];
-        $quote                     = $quote_data['quote'];
-        $orderIncrementId          = $quote_data['orderIncrementId'];
-
-        return $this->apiPlug->getQuote(
-            $requestDestinationDetails,
-            $productData,
-            $quote,
-            $orderIncrementId
-        );
+        if ($lastOccurrence !== false) {
+            return substr($string, 0, $lastOccurrence);
+        } else {
+            return $string;
+        }
     }
+
 }

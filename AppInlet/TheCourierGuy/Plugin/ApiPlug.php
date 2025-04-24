@@ -16,7 +16,6 @@ class ApiPlug
     private Curl $curl;
     private Monolog $logger;
     private Helper $helper;
-    private PayloadPrep $payloadPrep;
     private string $email;
     private string $password;
     private Shiplogic $shipLogic;
@@ -25,33 +24,29 @@ class ApiPlug
         Helper $helper,
         Monolog $logger,
         Curl $curl,
-        PayloadPrep $payloadPrep,
         Shiplogic $shipLogic
     ) {
         $this->curl        = $curl;
         $this->logger      = $logger;
         $this->helper      = $helper;
-        $this->payloadPrep = $payloadPrep;
         $this->email       = $this->helper->getConfig('account_number');
         $this->password    = $this->helper->getConfig('password');
         $this->shipLogic   = $shipLogic;
     }
 
-    public function prepare_api_data($request, $itemsList, $quote, $reference)
+    public function prepare_api_data($request, $itemsList, $quote, $reference, array $insuranceData = [])
     {
         $request['region'] = $quote->getShippingAddress()->getRegion();
 
-        $quoteParams            = [];
+        $quoteParams = [];
         $quoteParams['details'] = [];
 
-        /** added these just to make sure these tests are not processed as actual waybills */
-        $quoteParams['details']['specinstruction'] = "";
-        $quoteParams['details']['reference']       = $reference;
+        $declaredValue = $insuranceData['declared_value'] ?? 0.0;
+        $quoteParams['details']['reference'] = $reference;
 
         $tel       = $quote->getShippingAddress()->getTelephone();
         $firstName = $quote->getShippingAddress()->getFirstname();
         $lastName  = $quote->getShippingAddress()->getLastname();
-        $email     = $quote->getBillingAddress()->getCustomerEmail();
 
         $toAddress = [
             'destperadd1'    => $request['street'],
@@ -69,7 +64,7 @@ class ApiPlug
         $quoteParams['details']  = array_merge($quoteParams['details'], $toAddress);
         $quoteParams['contents'] = is_array($itemsList) ? $itemsList : [];
 
-        return $this->prepareData($quoteParams, $quote);
+        return $this->prepareData($quoteParams, $quote, (float) $declaredValue);
     }
 
     /**
@@ -81,9 +76,15 @@ class ApiPlug
      * @return array
      * @throws GuzzleException
      */
-    public function getQuote($request, $itemsList, $quote, $reference): array
+    public function getQuote($request, $itemsList, $quote, $reference, $insuranceData = []): array
     {
-        $data = $this->prepare_api_data($request, $itemsList, $quote, $reference);
+        $declaredValue = $insuranceData['declared_value'] ?? 0.0;
+
+        $data = $this->prepare_api_data($request, $itemsList, $quote, $reference, [
+            'declared_value' => (float) $declaredValue
+        ]);
+
+        $data['boxSizes'] = $this->gatherBoxSizes();
 
         if (count($data['parcels']) > 0) {
             return $this->shipLogic->getRates($data);
@@ -94,7 +95,6 @@ class ApiPlug
             ];
         }
     }
-
     public function signRequest(
         RequestInterface $request,
         string $accessKeyId,
@@ -106,34 +106,30 @@ class ApiPlug
         return $signature->signRequest($request, $credentials);
     }
 
-    protected function prepareData($quoteParams, $quote)
+    public function gatherBoxSizes(): array
     {
-        $items      = $quoteParams['contents'];
-        $items_data = [];
+        $parameters = [];
 
-        foreach ($items as $item) {
-            $length = isset($item['length']) && $item['length'] > 0 ? (int)$item['length'] : 1;
-            $width  = isset($item['width']) && $item['width'] > 0 ? (int)$item['width'] : 1;
-            $height = isset($item['height']) && $item['height'] > 0 ? (int)$item['height'] : 1;
-            $weight = isset($item['weight']) && $item['weight'] > 0 ? (float)$item['weight'] : 1;
-            $qty    = isset($item['quantity']) && $item['quantity'] > 0 ? (int)$item['quantity'] : 1;
+        $parameters['product_length_per_parcel_1'] = $this->helper->getConfig('length_of_flyer');
+        $parameters['product_width_per_parcel_1']  = $this->helper->getConfig('width_of_flyer');
+        $parameters['product_height_per_parcel_1'] = $this->helper->getConfig('height_of_flyer');
 
-            $unitWeight = round($weight / $qty, 2);
+        $parameters['product_length_per_parcel_2'] = $this->helper->getConfig('length_of_medium_parcel');
+        $parameters['product_width_per_parcel_2']  = $this->helper->getConfig('width_of_medium_parcel');
+        $parameters['product_height_per_parcel_2'] = $this->helper->getConfig('height_of_medium_parcel');
 
-            for ($i = 0; $i < $qty; $i++) {
-                $item_data    = [
-                    'submitted_length_cm' => $length,
-                    'submitted_width_cm'  => $width,
-                    'submitted_height_cm' => $height,
-                    'submitted_weight_kg' => $unitWeight,
-                ];
-                $items_data[] = $item_data;
-            }
-        }
+        $parameters['product_length_per_parcel_3'] = $this->helper->getConfig('length_of_large_parcel');
+        $parameters['product_width_per_parcel_3']  = $this->helper->getConfig('width_of_large_parcel');
+        $parameters['product_height_per_parcel_3'] = $this->helper->getConfig('height_large_parcel');
 
+        return $parameters;
+    }
+
+    protected function prepareData($quoteParams, $quote, float $declaredValue = 0.0)
+    {
         $details      = $quoteParams['details'];
-        $current_date = date("Y-m-d");
-        $t2           = date('Y-m-d', strtotime('+2 days'));
+        $current_date = date("Y-m-d\T00:00:00P");
+        $t2           = date("Y-m-d\T00:00:00P", strtotime('+2 days'));
 
         $sender_address = $this->helper->getConfig('shop_address_1') . " " . $this->helper->getConfig('shop_address_2');
 
@@ -160,8 +156,8 @@ class ApiPlug
                 "country"        => "ZA",
                 "code"           => $details['destperpcode']
             ],
-            "parcels"             => $items_data,
-            "declared_value"      => 0.0,
+            "parcels"             => $quoteParams['contents'],
+            "declared_value"      => $declaredValue,
             "collection_min_date" => $current_date,
             "delivery_min_date"   => $t2
         ];

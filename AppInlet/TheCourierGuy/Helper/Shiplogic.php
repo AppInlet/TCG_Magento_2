@@ -135,8 +135,23 @@ class Shiplogic extends Data
 
         $body->collection_address = $this->getAddressDetail($parameters['sender']);
         $body->delivery_address   = $this->getAddressDetail($parameters['receiver']);
-        $parcels                  = [];
-        $parcelsArray             = $parameters['parcels'];
+
+        $parcelsArray = $this->shipLogicApiPayload->getContentsPayload($parameters['boxSizes'], $parameters['parcels']);
+
+        $parcels      = [];
+
+        unset($parcelsArray['fitsFlyer']);
+
+        foreach ($parcelsArray as $parcelArray) {
+            $parcel                        = new stdClass();
+            $parcel->submitted_length_cm   = $parcelArray['dim1'];
+            $parcel->submitted_width_cm    = $parcelArray['dim2'];
+            $parcel->submitted_height_cm   = $parcelArray['dim3'];
+            $parcel->submitted_description = $this->removeTrailingComma($parcelArray['description']);
+            $parcel->item_count            = $parcelArray['itemCount'];
+            $parcel->submitted_weight_kg   = $parcelArray['actmass'];
+            $parcels[]                     = $parcel;
+        }
 
         foreach ($parcelsArray as $parcelArray) {
             $quantity = $parcelArray['quantity'] ?? 1;
@@ -159,6 +174,7 @@ class Shiplogic extends Data
                 $parcels[]                   = $parcel;
             }
         }
+
         $body->parcels        = $parcels;
         $body->declared_value = $parameters['declared_value'];
         if (!empty($parameters['opt_in_rates'])) {
@@ -178,6 +194,17 @@ class Shiplogic extends Data
         }
     }
 
+    public function removeTrailingComma($string)
+    {
+        $lastOccurrence = strrpos($string, ', ');
+
+        if ($lastOccurrence !== false) {
+            return substr($string, 0, $lastOccurrence);
+        } else {
+            return $string;
+        }
+    }
+
     /**
      * @param object $body
      *
@@ -186,10 +213,7 @@ class Shiplogic extends Data
      */
     public function createShipment(object $body): string
     {
-        return $this->makeAPIRequest(
-            'createShipment',
-            ['body' => json_encode($body)]
-        );
+        return $this->makeAPIRequest('createShipment', ['body' => json_encode($body)]);
     }
 
     public function getShipmentLabel(int $id): string

@@ -126,7 +126,20 @@ class Shipping extends AbstractCarrier implements CarrierInterface
             "postal_code" => $request->getDestPostcode()
         ];
 
-        $shippingClasses = $this->apiPlug->getQuote($requestDestinationDetails, $productData, $quote, $quoteId);
+        $insuranceData = [];
+        if ($this->helper->isInsuranceEnabled()) {
+            $insuranceData = [
+                'liability_cover' => 'Y',
+                'declared_value'  => (float)$grandTotal
+            ];
+        }
+        $shippingClasses = $this->apiPlug->getQuote(
+            $requestDestinationDetails,
+            $productData,
+            $quote,
+            $quoteId,
+            $insuranceData
+        );
 
         if (!isset($shippingClasses['rates'][0])) {
             $error = $shippingClasses['message'];
@@ -190,7 +203,7 @@ class Shipping extends AbstractCarrier implements CarrierInterface
         $prodHeight = $product->getData('height');
         $prodWeight = $product->getWeight();
 
-        $itemWeight = $item->getQty() * ($prodWeight ?: $defaultWeight);
+        $itemWeight = $prodWeight ?: $defaultWeight;
 
         return [
             'key'      => $packageItemId,
