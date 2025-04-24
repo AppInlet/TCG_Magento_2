@@ -396,6 +396,10 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Disable Boxes and Depot Options?</comment>
                 </field>
+                <field id="enable_insurance" translate="label" type="select" sortOrder="3950" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Insurance</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
         </section>
     </system>

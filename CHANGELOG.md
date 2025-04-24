@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.3.0](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.3.0)
+
+### Fixed
+
+- Resolved an issue where specific product combinations caused inaccuracies in the packing algorithm, improving reliability and precision.
+
+### Added
+
+- Introduced a toggleable setting for enabling or disabling shipping insurance, providing users with greater control over their preferences.
+
 ## [1.2.3](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.2.3)
 
 ### Fixed
