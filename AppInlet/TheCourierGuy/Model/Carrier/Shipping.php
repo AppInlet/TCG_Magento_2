@@ -100,7 +100,7 @@ class Shipping extends AbstractCarrier implements CarrierInterface
         }
 
         $grandTotal          = $quote->getGrandTotal();
-        $subtotal            = $quote->getSubtotal();
+        $subtotal            = $quote->getShippingAddress()->getSubtotalInclTax();
         $freeshippingminimum = $this->helper->getConfig('freeshippingminimum');
         $quoteId             = $quote->getId();
         $result              = $this->rateResultFactory->create();
