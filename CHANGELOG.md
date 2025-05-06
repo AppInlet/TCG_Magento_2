@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.1](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.3.1)
+
+### Fixed
+
+- Corrected an issue ensuring shipping quotes accurately include tax from items.
+
 ## [1.3.0](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.3.0)
 
 ### Fixed
