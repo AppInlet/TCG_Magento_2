@@ -166,16 +166,16 @@ class Shipping extends AbstractCarrier implements CarrierInterface
         $rateValue         = (int)($shippingClasses['rates'][0]['rate']);
         $percentage_markup = (int)($this->helper->getConfig('percentagemarkup'));
 
-        if ($this->helper->getConfig('flat_rate_active') == 1 && $grandTotal <= $freeshippingminimum) {
-            $shippingPrice = $this->helper->getConfig('flat_rate');
-            foreach ($allRates as $rate) {
-                $rate->setPrice($shippingPrice);
-            }
-        } elseif ($subtotal >= $freeshippingminimum) {
+        if ($subtotal >= $freeshippingminimum) {
             $shippingPrice = 0;
             foreach ($allRates as $rate) {
                 $rate->setPrice($shippingPrice);
                 $rate->setData("method_title", "**FREE SHIPPING** " . $rate->getData("method_title"));
+            }
+        } elseif ($this->helper->getConfig('flat_rate_active') == 1) {
+            $shippingPrice = $this->helper->getConfig('flat_rate');
+            foreach ($allRates as $rate) {
+                $rate->setPrice($shippingPrice);
             }
         } else {
             $shippingPrice = $rateValue + (($percentage_markup / 100) * $rateValue);

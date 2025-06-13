@@ -28,11 +28,11 @@ class TCGQuote
         QuoteFactory $quoteFactory,
         ShipLogicApiPayload $shipLogicApiPayload,
     ) {
-        $this->quoteFactory    = $quoteFactory;
-        $this->helper          = $helper;
-        $this->shipmentFactory = $shipmentFactory;
-        $this->apiPlug         = $apiPlug;
-        $this->monolog         = $monolog;
+        $this->quoteFactory        = $quoteFactory;
+        $this->helper              = $helper;
+        $this->shipmentFactory     = $shipmentFactory;
+        $this->apiPlug             = $apiPlug;
+        $this->monolog             = $monolog;
         $this->shipLogicApiPayload = $shipLogicApiPayload;
     }
 
@@ -56,14 +56,17 @@ class TCGQuote
             $packageItemId = 0;
 
             $productRepo = \Magento\Framework\App\ObjectManager::getInstance()
-                ->get(\Magento\Catalog\Api\ProductRepositoryInterface::class);
+                                                               ->get(
+                                                                   \Magento\Catalog\Api\ProductRepositoryInterface::class
+                                                               );
 
             foreach ($order->getAllItems() as $item) {
                 if ($item->getIsVirtual()) {
                     continue;
                 }
 
-                if ($item->getProductType() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                if ($item->getProductType(
+                ) === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
                     continue;
                 }
 
@@ -90,9 +93,12 @@ class TCGQuote
                 $packageItemId++;
             }
 
-            $parcelsArray = $this->shipLogicApiPayload->getContentsPayload($this->apiPlug->gatherBoxSizes(), $productData);
+            $parcelsArray = $this->shipLogicApiPayload->getContentsPayload(
+                $this->apiPlug->gatherBoxSizes(),
+                $productData
+            );
 
-            $parcels      = [];
+            $parcels = [];
 
             unset($parcelsArray['fitsFlyer']);
 
@@ -156,5 +162,4 @@ class TCGQuote
             return $string;
         }
     }
-
 }

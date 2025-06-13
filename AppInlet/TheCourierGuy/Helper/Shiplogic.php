@@ -138,7 +138,7 @@ class Shiplogic extends Data
 
         $parcelsArray = $this->shipLogicApiPayload->getContentsPayload($parameters['boxSizes'], $parameters['parcels']);
 
-        $parcels      = [];
+        $parcels = [];
 
         unset($parcelsArray['fitsFlyer']);
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.3.2)
+
+### Fixed
+
+- Corrected an issue ensuring free shipping thresholds are calculated correctly against the cart subtotal before
+  discounts are applied.
+
 ## [1.3.1](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.3.1)
 
 ### Fixed
@@ -10,11 +17,13 @@
 
 ### Fixed
 
-- Resolved an issue where specific product combinations caused inaccuracies in the packing algorithm, improving reliability and precision.
+- Resolved an issue where specific product combinations caused inaccuracies in the packing algorithm, improving
+  reliability and precision.
 
 ### Added
 
-- Introduced a toggleable setting for enabling or disabling shipping insurance, providing users with greater control over their preferences.
+- Introduced a toggleable setting for enabling or disabling shipping insurance, providing users with greater control
+  over their preferences.
 
 ## [1.2.3](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.2.3)
 

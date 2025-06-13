@@ -27,8 +27,7 @@ class ShipLogicContentPayload
      *
      * @return mixed
      */
-    private
-    static function getMaxPackingConfiguration(
+    private static function getMaxPackingConfiguration(
         $parcel,
         $package
     ) {
@@ -59,8 +58,7 @@ class ShipLogicContentPayload
      *
      * @return float|int|mixed
      */
-    private
-    static function getActualPackingConfiguration(
+    private static function getActualPackingConfiguration(
         $parcel,
         $package,
         $count
@@ -90,8 +88,7 @@ class ShipLogicContentPayload
         return $usedHeight;
     }
 
-    private
-    static function getActualPackingConfigurationAdvanced(
+    private static function getActualPackingConfigurationAdvanced(
         $parcel,
         $package,
         $count
@@ -499,8 +496,7 @@ class ShipLogicContentPayload
         }
     }
 
-    private
-    function getBoxKey(
+    private function getBoxKey(
         $fits,
         $slug,
         $itemCount
@@ -516,8 +512,7 @@ class ShipLogicContentPayload
         return $fitsSlug;
     }
 
-    private
-    function getItemTotalVolume(
+    private function getItemTotalVolume(
         $item
     ) {
         return $item['item']['item']['quantity'] * $item['item']['volume'];

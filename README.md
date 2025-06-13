@@ -1,6 +1,6 @@
 # TCG_Magento_2
 
-This is The Courier Guy plugin v1.3.1 for Magento v2.4.7.
+This is The Courier Guy module v1.3.2 for Magento v2.4.7.
 
 ## Installation
 
@@ -89,3 +89,8 @@ attributes are correctly configured:
 * Navigate to the module's configuration in the Magento admin.
 * Ensure the "Typical Length", "Typical Width", "Typical Height", and "Typical Weight" fields are correctly set. These
   values will be used as defaults if product dimensions are missing.
+
+  ## PHP Code Standards
+
+-
+``vendor/bin/phpcs --standard=Magento2 --extensions=php,phtml --error-severity=10 --ignore-annotations AppInlet/TheCourierGuy/``

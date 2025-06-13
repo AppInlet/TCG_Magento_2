@@ -17,6 +17,7 @@ use Magento\Framework\App\PageCache\Version;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use AppInlet\TheCourierGuy\Plugin\ShipLogicApiPayload;
+
 class Data extends AbstractHelper
 {
     public const XML_PATH_CATALOG = 'carriers/';
@@ -56,11 +57,11 @@ class Data extends AbstractHelper
         LoggerInterface $logger,
         ShipLogicApiPayload $shipLogicApiPayload,
     ) {
-        $this->configWriter              = $configWriter;
-        $this->cacheTypeList             = $cacheTypeList;
-        $this->cacheFrontendPool         = $cacheFrontendPool;
-        $this->logger                    = $logger;
-        $this->shipLogicApiPayload       = $shipLogicApiPayload;
+        $this->configWriter        = $configWriter;
+        $this->cacheTypeList       = $cacheTypeList;
+        $this->cacheFrontendPool   = $cacheFrontendPool;
+        $this->logger              = $logger;
+        $this->shipLogicApiPayload = $shipLogicApiPayload;
         parent::__construct($context);
     }
 
@@ -126,6 +127,7 @@ class Data extends AbstractHelper
             $cacheFrontend->getBackend()->clean();
         }
     }
+
     public function isInsuranceEnabled(): bool
     {
         return $this->getConfig('enable_insurance') === '1';

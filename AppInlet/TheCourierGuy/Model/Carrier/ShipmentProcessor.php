@@ -176,7 +176,8 @@ class ShipmentProcessor
         $createShipmentBody->special_instructions_collection = '';
         $createShipmentBody->special_instructions_delivery   = '';
         $createShipmentBody->declared_value                  = $body['declared_value'];
-        $createShipmentBody->liability_cover                 = ($this->helper->isInsuranceEnabled() && $body['declared_value'] > 0) ? 'Y' : 'N';
+        $createShipmentBody->liability_cover                 = ($this->helper->isInsuranceEnabled(
+        ) && $body['declared_value'] > 0) ? 'Y' : 'N';
         $createShipmentBody->service_level_code              = $body['service_level_code'];
         $createShipmentBody->customer_reference              = $order->getIncrementId();
         if ($returnShipment) {
@@ -189,6 +190,7 @@ class ShipmentProcessor
 
         return $createShipmentBody;
     }
+
     /**
      * @throws GuzzleException
      */
@@ -224,9 +226,9 @@ class ShipmentProcessor
         );
 
         $body['service_level_code'] = $shippingMethodCode;
-        $request_body = $this->createShipmentBody($order, $body, $observerShipment === null);
-        $response = $shipLogicApi->createShipment($request_body);
-        $response = json_decode($response);
+        $request_body               = $this->createShipmentBody($order, $body, $observerShipment === null);
+        $response                   = $shipLogicApi->createShipment($request_body);
+        $response                   = json_decode($response);
 
         $shipmentId        = $response->id;
         $trackingReference = $response->short_tracking_reference;
@@ -249,7 +251,9 @@ class ShipmentProcessor
                     $this->shipmentSender->send($observerShipment);
                     $observerShipment->setEmailSent(true);
                 }
-            } catch (\Exception $e) {$this->helper->log($e->getMessage(), 'error');}
+            } catch (\Exception $e) {
+                $this->helper->log($e->getMessage(), 'error');
+            }
         }
         $order->save();
     }
