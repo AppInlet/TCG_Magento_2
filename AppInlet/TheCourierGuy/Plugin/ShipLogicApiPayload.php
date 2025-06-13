@@ -1,10 +1,6 @@
 <?php
 
 namespace AppInlet\TheCourierGuy\Plugin;
-/**
- * @author The Courier Guy
- * @package tcg/core
- */
 
 class ShipLogicApiPayload
 {
@@ -28,7 +24,7 @@ class ShipLogicApiPayload
      */
     public function getContentsPayload($parameters, $items)
     {
-        self::$r1                   = $r2 = [];
+        self::$r1 = $r2 = [];
 
         /** Get the standard parcel sizes
          * At least one must be set or default to standard size
@@ -85,7 +81,6 @@ class ShipLogicApiPayload
 
         if (count($fittingItems) === 1) {
             $conLoad->calculate_single_fitting_items_packing(self::$r1, self::$j);
-
         } elseif (count($fittingItems) > 1) {
             $r2 = $conLoad->calculate_multi_fitting_items_basic();
         }
@@ -183,23 +178,23 @@ class ShipLogicApiPayload
     {
         $all_itemms = [];
         foreach ($items as $item) {
-            $itm               = [];
-            $itm['item']               = $item;
-            $itm['dimensions']         = [];
-            $itm['dimensions']['mass'] = $item['weight'] ?? 0.0;
-                $itm['has_dimensions']       = true;
-                $itm['toobig']               = false;
-                $itm['dimensions']['height'] = $item['height'] ?? 1;
-                $itm['dimensions']['width']  = $item['width'] ?? 1;
-                $itm['dimensions']['length'] = $item['length'] ?? 1;
-            $itmdimensionsheight = $itm['dimensions']['height'];
-            $itmdimensionswidth  = $itm['dimensions']['width'];
-            $itmdimensionslength = $itm['dimensions']['length'];
-            $itm['volume']       = 0;
+            $itm                         = [];
+            $itm['item']                 = $item;
+            $itm['dimensions']           = [];
+            $itm['dimensions']['mass']   = $item['weight'] ?? 0.0;
+            $itm['has_dimensions']       = true;
+            $itm['toobig']               = false;
+            $itm['dimensions']['height'] = $item['height'] ?? 1;
+            $itm['dimensions']['width']  = $item['width'] ?? 1;
+            $itm['dimensions']['length'] = $item['length'] ?? 1;
+            $itmdimensionsheight         = $itm['dimensions']['height'];
+            $itmdimensionswidth          = $itm['dimensions']['width'];
+            $itmdimensionslength         = $itm['dimensions']['length'];
+            $itm['volume']               = 0;
             if ($itmdimensionsheight != 0 && $itmdimensionswidth != 0 && $itmdimensionslength != 0) {
                 $itm['volume'] = intval($itmdimensionsheight) * intval($itmdimensionswidth) * intval(
-                        $itmdimensionslength
-                    );
+                    $itmdimensionslength
+                );
             }
             $itm['slug']              = $item['name'] ?? 'Product';
             $all_itemms[$item['key']] = $itm;
@@ -377,8 +372,7 @@ class ShipLogicApiPayload
                 if ($fittings[$i]['item']['volume'] != $fittings[$j]['item']['volume']) {
                     continue;
                 }
-                if (
-                    $fittings[$i]['item']['dimensions']['height'] != $fittings[$j]['item']['dimensions']['height']
+                if ($fittings[$i]['item']['dimensions']['height'] != $fittings[$j]['item']['dimensions']['height']
                     && $fittings[$i]['item']['dimensions']['width'] != $fittings[$j]['item']['dimensions']['width']
                 ) {
                     continue;
@@ -456,8 +450,7 @@ class ShipLogicApiPayload
             $productDims[2] = $item['dimensions']['height'];
             rsort($productDims);
             $fits = false;
-            if (
-                $productDims[0] <= $parcel[0]
+            if ($productDims[0] <= $parcel[0]
                 && $productDims[1] <= $parcel[1]
                 && $productDims[2] <= $parcel[2]
             ) {

@@ -26,22 +26,22 @@ class ApiPlug
         Curl $curl,
         Shiplogic $shipLogic
     ) {
-        $this->curl        = $curl;
-        $this->logger      = $logger;
-        $this->helper      = $helper;
-        $this->email       = $this->helper->getConfig('account_number');
-        $this->password    = $this->helper->getConfig('password');
-        $this->shipLogic   = $shipLogic;
+        $this->curl      = $curl;
+        $this->logger    = $logger;
+        $this->helper    = $helper;
+        $this->email     = $this->helper->getConfig('account_number');
+        $this->password  = $this->helper->getConfig('password');
+        $this->shipLogic = $shipLogic;
     }
 
     public function prepare_api_data($request, $itemsList, $quote, $reference, array $insuranceData = [])
     {
         $request['region'] = $quote->getShippingAddress()->getRegion();
 
-        $quoteParams = [];
+        $quoteParams            = [];
         $quoteParams['details'] = [];
 
-        $declaredValue = $insuranceData['declared_value'] ?? 0.0;
+        $declaredValue                       = $insuranceData['declared_value'] ?? 0.0;
         $quoteParams['details']['reference'] = $reference;
 
         $tel       = $quote->getShippingAddress()->getTelephone();
@@ -64,7 +64,7 @@ class ApiPlug
         $quoteParams['details']  = array_merge($quoteParams['details'], $toAddress);
         $quoteParams['contents'] = is_array($itemsList) ? $itemsList : [];
 
-        return $this->prepareData($quoteParams, $quote, (float) $declaredValue);
+        return $this->prepareData($quoteParams, $quote, (float)$declaredValue);
     }
 
     /**
@@ -81,7 +81,7 @@ class ApiPlug
         $declaredValue = $insuranceData['declared_value'] ?? 0.0;
 
         $data = $this->prepare_api_data($request, $itemsList, $quote, $reference, [
-            'declared_value' => (float) $declaredValue
+            'declared_value' => (float)$declaredValue
         ]);
 
         $data['boxSizes'] = $this->gatherBoxSizes();
@@ -95,6 +95,7 @@ class ApiPlug
             ];
         }
     }
+
     public function signRequest(
         RequestInterface $request,
         string $accessKeyId,
