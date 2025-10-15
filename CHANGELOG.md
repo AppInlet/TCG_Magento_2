@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.0](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.4.0)
+
+### Added
+
+- Added the ability to set custom shipping labels and pricing to the checkout page.
+
 ## [1.3.2](https://github.com/The-Courier-Guy/TCG_Magento_2/releases/tag/v1.3.2)
 
 ### Fixed

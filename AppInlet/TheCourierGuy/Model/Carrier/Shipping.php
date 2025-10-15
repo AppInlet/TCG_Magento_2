@@ -4,6 +4,7 @@ namespace AppInlet\TheCourierGuy\Model\Carrier;
 
 use AppInlet\TheCourierGuy\Helper\Data as Helper;
 use AppInlet\TheCourierGuy\Logger\Logger as Monolog;
+use AppInlet\TheCourierGuy\Model\Config\Source\CustomRatePricingOptions;
 use AppInlet\TheCourierGuy\Model\ShipmentFactory;
 use AppInlet\TheCourierGuy\Plugin\ApiPlug;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -175,6 +176,10 @@ class Shipping extends AbstractCarrier implements CarrierInterface
         } elseif ($this->helper->getConfig('flat_rate_active') == 1) {
             $shippingPrice = $this->helper->getConfig('flat_rate');
             foreach ($allRates as $rate) {
+                if ($rate->getData("custom_rate_applied")) {
+                    continue;
+                }
+
                 $rate->setPrice($shippingPrice);
             }
         } else {
@@ -224,10 +229,76 @@ class Shipping extends AbstractCarrier implements CarrierInterface
         $method->setCarrier($this->code);
         $method->setCarrierTitle($this->helper->getConfig('title'));
         $method->setMethod($rate['service_level']['code']);
-        $method->setMethodTitle($rate['service_level']['name']);
-        $method->setPrice($rate['rate']);
-        $method->setCost($rate['rate']);
+
+        $rateCode = $rate['service_level']['code'];
+
+        /**
+         * Check if custom shipping labels and pricing are enabled
+         *
+         * If enabled, retrieve custom label and pricing type for the specific rate code
+         * */
+        if ($this->helper->isCustomShippingLabelsEnabled()) {
+            $customLabel = $this->helper->getCustomShippingLabel($rateCode);
+            $pricingType = $this->helper->getCustomPricingType($rateCode);
+
+            if (!empty($pricingType) && $pricingType !== CustomRatePricingOptions::PRICING_TYPE_DEFAULT) {
+                $rateModifier = $this->helper->getRateModifier($rateCode);
+            } else {
+                $rateModifier = 0;
+            }
+
+            // Apply custom label if configured
+            $methodTitle = !empty($customLabel) ? $customLabel : $rate['service_level']['name'];
+            $method->setMethodTitle($methodTitle);
+
+            // Apply custom pricing if configured
+            $finalPrice = $this->calculateCustomPrice($rate['rate'], $pricingType, $rateModifier);
+
+            if ($finalPrice !== $rate['rate']) {
+                $method->setData('custom_rate_applied', true);
+            }
+
+            $method->setPrice($finalPrice);
+            $method->setCost($finalPrice);
+        } else {
+            // Use the default API values
+            $method->setMethodTitle($rate['service_level']['name']);
+            $method->setPrice($rate['rate']);
+            $method->setCost($rate['rate']);
+        }
 
         return $method;
+    }
+
+    /**
+     * Calculate the final price based on custom pricing configuration
+     *
+     * @param float|int $defaultRate
+     * @param string $pricingType
+     * @param float|int $rateModifier
+     *
+     * @return float|int
+     */
+    protected function calculateCustomPrice(
+        float|int $defaultRate,
+        string $pricingType,
+        float|int $rateModifier
+    ): float|int {
+        if ($rateModifier === 0 || empty($pricingType) || $pricingType === CustomRatePricingOptions::PRICING_TYPE_DEFAULT) {
+            return $defaultRate;
+        }
+
+        $customRate = match ($pricingType) {
+            'fixed' => $rateModifier,
+            'percentage' => $defaultRate + (($rateModifier / 100) * $defaultRate),
+            'surcharge' => $defaultRate + $rateModifier,
+            default => $defaultRate,
+        };
+
+        if ($customRate <= 0) {
+            return 0;
+        }
+
+        return $customRate;
     }
 }

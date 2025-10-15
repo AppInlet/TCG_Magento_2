@@ -56,9 +56,9 @@ class TCGQuote
             $packageItemId = 0;
 
             $productRepo = \Magento\Framework\App\ObjectManager::getInstance()
-                                                               ->get(
-                                                                   \Magento\Catalog\Api\ProductRepositoryInterface::class
-                                                               );
+                ->get(
+                    \Magento\Catalog\Api\ProductRepositoryInterface::class
+                );
 
             foreach ($order->getAllItems() as $item) {
                 if ($item->getIsVirtual()) {

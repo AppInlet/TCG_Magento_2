@@ -132,4 +132,52 @@ class Data extends AbstractHelper
     {
         return $this->getConfig('enable_insurance') === '1';
     }
+
+    public function isCustomShippingLabelsEnabled($storeId = null): bool
+    {
+        return $this->getConfigValue(
+            'carriers/appinlet_the_courier_guy/enable_custom_labels_and_pricing',
+            $storeId
+        ) === '1';
+    }
+
+    /**
+     * Get custom shipping label name for a specific rate code
+     *
+     * @param string $rateCode
+     * @param null $storeId
+     * @return string
+     */
+    public function getCustomShippingLabel(string $rateCode, $storeId = null): string
+    {
+        $configPath = "carriers/appinlet_the_courier_guy/courier_guy_{$rateCode}/shipping_label_name_{$rateCode}";
+        return $this->getConfigValue($configPath, $storeId) ?: '';
+    }
+
+    /**
+     * Get custom pricing type for a specific rate code
+     *
+     * @param string $rateCode
+     * @param null $storeId
+     * @return string
+     */
+    public function getCustomPricingType(string $rateCode, $storeId = null): string
+    {
+        $configPath = "carriers/appinlet_the_courier_guy/courier_guy_{$rateCode}/pricing_type_{$rateCode}";
+        return $this->getConfigValue($configPath, $storeId) ?: '';
+    }
+
+    /**
+     * Get custom rate for a specific rate code
+     *
+     * @param string $rateCode
+     * @param null $storeId
+     * @return float|int
+     */
+    public function getRateModifier(string $rateCode, $storeId = null): float|int
+    {
+        $configPath = "carriers/appinlet_the_courier_guy/courier_guy_{$rateCode}/custom_rate_{$rateCode}";
+        $rate       = $this->getConfigValue($configPath, $storeId);
+        return $rate ? (float)$rate : 0.0;
+    }
 }
